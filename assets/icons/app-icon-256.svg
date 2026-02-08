@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="256" height="256" rx="64" fill="url(#gradient256)"/>
+
+  <defs>
+    <linearGradient id="gradient256" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Browser window -->
+  <rect x="48" y="64" width="160" height="128" rx="8" fill="white" opacity="0.15"/>
+  <rect x="48" y="64" width="160" height="24" rx="8" fill="white" opacity="0.25"/>
+  <circle cx="64" cy="76" r="4" fill="white" opacity="0.9"/>
+  <circle cx="78" cy="76" r="4" fill="white" opacity="0.9"/>
+  <circle cx="92" cy="76" r="4" fill="white" opacity="0.9"/>
+
+  <!-- Fingerprint -->
+  <path d="M128 110 C128 110 120 110 120 118 C120 126 128 126 128 126 M128 134 C128 134 112 134 112 118 C112 102 128 102 128 102 M128 142 C128 142 104 142 104 118 C104 94 128 94 128 94 M136 110 C136 110 144 110 144 118 C144 126 136 126 136 126 M136 134 C136 134 152 134 152 118 C152 102 136 102 136 102 M136 142 C136 142 160 142 160 118 C160 94 136 94 136 94"
+        stroke="white"
+        stroke-width="3"
+        stroke-linecap="round"
+        fill="none"
+        opacity="0.95"/>
+
+  <!-- Shield badge -->
+  <g transform="translate(180, 170)">
+    <path d="M 0 0 L -6 -4 L 0 -24 L 6 -4 Z" fill="white" opacity="0.9"/>
+    <path d="M 0 -6 L 0 -16 M -3 -10 L 3 -14" stroke="#6366f1" stroke-width="1" stroke-linecap="round"/>
+  </g>
+</svg>

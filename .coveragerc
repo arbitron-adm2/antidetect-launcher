@@ -1,0 +1,35 @@
+"""Test coverage configuration and utilities."""
+
+[run]
+source = src/antidetect_playwright
+branch = True
+omit =
+    */tests/*
+    */conftest.py
+    */__pycache__/*
+    */site-packages/*
+    */vendor/*
+
+[report]
+precision = 2
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    def __str__
+    raise AssertionError
+    raise NotImplementedError
+    if __name__ == .__main__.:
+    if TYPE_CHECKING:
+    @abstractmethod
+    @abc.abstractmethod
+    class .*\bProtocol\):
+    @overload
+
+show_missing = True
+skip_covered = False
+
+[html]
+directory = htmlcov
+
+[json]
+output = coverage.json
