@@ -3,9 +3,9 @@ requires = ["setuptools>=68.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "antidetect-playwright"
+name = "antidetect-launcher"
 version = "0.1.0"
-description = "Stealth browser automation with anti-detection capabilities"
+description = "Stealth browser launcher with anti-detection capabilities (Camoufox)"
 readme = "README.md"
 requires-python = ">=3.12"
 license = { text = "MIT" }
@@ -52,21 +52,20 @@ package = [
     "pillow>=11.0.0",
     "cairosvg>=2.7.0",
 ]
-all = ["antidetect-playwright[gui,dev]"]
+all = ["antidetect-launcher[gui,dev]"]
 
 [project.scripts]
-antidetect-playwright = "antidetect_playwright.__main__:main"
-antidetect-browser = "antidetect_playwright.gui.app:main"
+antidetect-launcher = "antidetect_launcher.gui.app:main"
 
 [project.urls]
-Homepage = "https://github.com/antidetect/antidetect-playwright"
-Repository = "https://github.com/antidetect/antidetect-playwright"
+Homepage = "https://github.com/arbitron-adm2/antidetect-launcher"
+Repository = "https://github.com/arbitron-adm2/antidetect-launcher"
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.setuptools.package-data]
-antidetect_playwright = ["py.typed", "resources/chrome/**/*", "resources/default_config/*.toml", "resources/*.svg"]
+antidetect_launcher = ["py.typed", "resources/chrome/**/*", "resources/default_config/*.toml", "resources/*.svg"]
 
 [tool.mypy]
 python_version = "3.12"
@@ -99,7 +98,7 @@ ignore = [
 ]
 
 [tool.ruff.isort]
-known-first-party = ["antidetect_playwright"]
+known-first-party = ["antidetect_launcher"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
@@ -109,7 +108,7 @@ python_functions = ["test_*"]
 addopts = "-v --tb=short"
 
 [tool.coverage.run]
-source = ["src/antidetect_playwright"]
+source = ["src/antidetect_launcher"]
 branch = true
 
 [tool.coverage.report]

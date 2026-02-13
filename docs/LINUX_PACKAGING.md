@@ -2,7 +2,7 @@
 
 ## Overview
 
-Antidetect Browser supports multiple Linux packaging formats:
+Antidetect Launcher supports multiple Linux packaging formats:
 - **DEB packages** (Debian/Ubuntu)
 - **AppImage** (Universal Linux)
 - **Flatpak** (Sandboxed installation)
@@ -11,14 +11,14 @@ Antidetect Browser supports multiple Linux packaging formats:
 
 ### Installation Locations
 
-- **Application**: `/opt/antidetect-browser/`
-- **Virtual Environment**: `/opt/antidetect-browser/venv/`
-- **Executables**: `/usr/bin/antidetect-browser`, `/usr/bin/antidetect-playwright`
-- **Data**: `/var/lib/antidetect-browser/`
-- **Logs**: `/var/log/antidetect-browser/`
-- **Cache**: `/var/cache/antidetect-browser/`
-- **Desktop file**: `/usr/share/applications/antidetect-browser.desktop`
-- **Icons**: `/usr/share/icons/hicolor/*/apps/antidetect-browser.png`
+- **Application**: `/opt/antidetect-launcher/`
+- **Virtual Environment**: `/opt/antidetect-launcher/venv/`
+- **Executables**: `/usr/bin/antidetect-launcher`, `/usr/bin/antidetect-launcher`
+- **Data**: `/var/lib/antidetect-launcher/`
+- **Logs**: `/var/log/antidetect-launcher/`
+- **Cache**: `/var/cache/antidetect-launcher/`
+- **Desktop file**: `/usr/share/applications/antidetect-launcher.desktop`
+- **Icons**: `/usr/share/icons/hicolor/*/apps/antidetect-launcher.png`
 
 ### Building
 
@@ -27,7 +27,7 @@ Antidetect Browser supports multiple Linux packaging formats:
 sudo apt-get install devscripts debhelper dh-python build-essential python3-all python3-setuptools
 
 # Build the package
-cd /path/to/antidetect-playwright
+cd /path/to/antidetect-launcher
 ./build/scripts/build_deb.sh build
 
 # The .deb file will be in build/debian/
@@ -37,26 +37,26 @@ cd /path/to/antidetect-playwright
 
 ```bash
 # Install the package
-sudo dpkg -i build/debian/antidetect-browser_0.1.0-1_amd64.deb
+sudo dpkg -i build/debian/antidetect-launcher_0.1.0-1_amd64.deb
 
 # Fix dependencies if needed
 sudo apt-get install -f
 
 # Launch GUI
-antidetect-browser
+antidetect-launcher
 
 # Or use CLI
-antidetect-playwright --help
+antidetect-launcher --help
 ```
 
 ### Uninstallation
 
 ```bash
 # Remove package but keep configuration
-sudo apt-get remove antidetect-browser
+sudo apt-get remove antidetect-launcher
 
 # Complete removal including data
-sudo apt-get purge antidetect-browser
+sudo apt-get purge antidetect-launcher
 ```
 
 ### Dependencies
@@ -86,17 +86,17 @@ sudo apt-get install wget fuse libfuse2
 # Build AppImage
 ./build/scripts/build_appimage.sh
 
-# Output: build/appimage/AntidetectBrowser-0.1.0-x86_64.AppImage
+# Output: build/appimage/AntidetectLauncher-0.1.0-x86_64.AppImage
 ```
 
 ### Running
 
 ```bash
 # Make executable
-chmod +x AntidetectBrowser-0.1.0-x86_64.AppImage
+chmod +x AntidetectLauncher-0.1.0-x86_64.AppImage
 
 # Run
-./AntidetectBrowser-0.1.0-x86_64.AppImage
+./AntidetectLauncher-0.1.0-x86_64.AppImage
 ```
 
 ### Features
@@ -163,16 +163,16 @@ flatpak uninstall com.antidetect.Browser
 ### DEB Package Permissions
 
 Post-installation:
-- `/opt/antidetect-browser/`: 755 (readable by all)
-- `/var/lib/antidetect-browser/`: 755 (user data)
-- `/var/log/antidetect-browser/`: 755 (log files)
+- `/opt/antidetect-launcher/`: 755 (readable by all)
+- `/var/lib/antidetect-launcher/`: 755 (user data)
+- `/var/log/antidetect-launcher/`: 755 (log files)
 - Executables: 755
 
 ### Security Considerations
 
 1. **Virtual Environment**: Isolated Python dependencies
-2. **User Data**: Stored in `/var/lib/antidetect-browser/`
-3. **Logs**: Accessible in `/var/log/antidetect-browser/`
+2. **User Data**: Stored in `/var/lib/antidetect-launcher/`
+3. **Logs**: Accessible in `/var/log/antidetect-launcher/`
 4. **No SUID**: No setuid binaries included
 5. **Desktop Integration**: Standard XDG desktop file
 
@@ -193,7 +193,7 @@ sudo update-desktop-database
 
 **Playwright browser not found:**
 ```bash
-/opt/antidetect-browser/venv/bin/playwright install chromium
+/opt/antidetect-launcher/venv/bin/playwright install chromium
 ```
 
 ### AppImage Issues
@@ -201,7 +201,7 @@ sudo update-desktop-database
 **FUSE not available:**
 ```bash
 # Extract and run
-./AntidetectBrowser-0.1.0-x86_64.AppImage --appimage-extract
+./AntidetectLauncher-0.1.0-x86_64.AppImage --appimage-extract
 ./squashfs-root/AppRun
 ```
 
@@ -258,7 +258,7 @@ sudo ./build/scripts/build_deb.sh install
 ### Lintian Checks
 
 ```bash
-lintian build/debian/antidetect-browser_0.1.0-1_amd64.deb
+lintian build/debian/antidetect-launcher_0.1.0-1_amd64.deb
 ```
 
 ### Package Quality
@@ -272,4 +272,4 @@ lintian build/debian/antidetect-browser_0.1.0-1_amd64.deb
 ## Support
 
 For packaging issues, please report at:
-https://github.com/antidetect/antidetect-playwright/issues
+https://github.com/antidetect/antidetect-launcher/issues

@@ -72,7 +72,7 @@
 
 ### Application Integration
 
-**File:** `src/antidetect_playwright/gui/app.py`
+**File:** `src/antidetect_launcher/gui/app.py`
 
 ```python
 # Added imports
@@ -98,7 +98,7 @@ if icon_path.exists():
 
 ### New Module: `paths.py`
 
-**File:** `src/antidetect_playwright/gui/paths.py` (140 lines)
+**File:** `src/antidetect_launcher/gui/paths.py` (140 lines)
 
 **Functions:**
 - `get_data_dir()` - Main data directory
@@ -120,20 +120,20 @@ Detected when: Running from project directory
 
 **Linux:**
 ```
-~/.local/share/antidetect-browser/
+~/.local/share/antidetect-launcher/
 ```
 - Follows XDG Base Directory specification
 - Override with `XDG_DATA_HOME` environment variable
 
 **Windows:**
 ```
-%APPDATA%\AntidetectBrowser\
+%APPDATA%\AntidetectLauncher\
 ```
-Typically: `C:\Users\{username}\AppData\Roaming\AntidetectBrowser\`
+Typically: `C:\Users\{username}\AppData\Roaming\AntidetectLauncher\`
 
 **macOS:**
 ```
-~/Library/Application Support/AntidetectBrowser/
+~/Library/Application Support/AntidetectLauncher/
 ```
 
 ### Detection Logic
@@ -193,10 +193,10 @@ python migrate_data.py
 
 **Output:**
 ```
-Migration Tool - Antidetect Browser
+Migration Tool - Antidetect Launcher
 ============================================================
-Old data location: /home/user/Projects/antidetect-playwright/data
-New data location: /home/user/.local/share/antidetect-browser
+Old data location: /home/user/Projects/antidetect-launcher/data
+New data location: /home/user/.local/share/antidetect-launcher
 ============================================================
 
 📦 Migrating data...
@@ -206,7 +206,7 @@ New data location: /home/user/.local/share/antidetect-browser
 
 ✅ Migration completed successfully!
 
-Your data is now at: /home/user/.local/share/antidetect-browser
+Your data is now at: /home/user/.local/share/antidetect-launcher
 ```
 
 ### Documentation Updates
@@ -231,14 +231,14 @@ Your data is now at: /home/user/.local/share/antidetect-browser
 
 **Development mode detection:**
 ```bash
-$ python -c "from src.antidetect_playwright.gui.paths import *; print(f'Dev mode: {is_development_mode()}'); print(f'Data dir: {get_data_dir()}')"
+$ python -c "from src.antidetect_launcher.gui.paths import *; print(f'Dev mode: {is_development_mode()}'); print(f'Data dir: {get_data_dir()}')"
 Development mode: True
-Data directory: /home/fsdf1234/Projects/antidetect-playwright/data
+Data directory: /home/fsdf1234/Projects/antidetect-launcher/data
 ```
 
 **Expected behavior after installation:**
-- Linux .deb package → `~/.local/share/antidetect-browser/`
-- Windows .exe installer → `%APPDATA%\AntidetectBrowser\`
+- Linux .deb package → `~/.local/share/antidetect-launcher/`
+- Windows .exe installer → `%APPDATA%\AntidetectLauncher\`
 - PyInstaller bundle → Platform-specific paths
 
 ---
@@ -269,8 +269,8 @@ Data directory: /home/fsdf1234/Projects/antidetect-playwright/data
 
 ### Modified
 1. `.gitignore` - Comprehensive exclusions
-2. `src/antidetect_playwright/gui/app.py` - Icons and paths
-3. `src/antidetect_playwright/gui/storage.py` - Auto-detect paths
+2. `src/antidetect_launcher/gui/app.py` - Icons and paths
+3. `src/antidetect_launcher/gui/storage.py` - Auto-detect paths
 4. `docs/CONFIGURATION_STORAGE.md` - Updated documentation
 5. `README.md` - Added data storage section
 
@@ -280,7 +280,7 @@ Data directory: /home/fsdf1234/Projects/antidetect-playwright/data
 3. `assets/icons/app-icon-64.svg` - Small icon 64×64
 4. `assets/icons/tray-icon.svg` - System tray icon 22×22
 5. `assets/icons/README.md` - Icon documentation
-6. `src/antidetect_playwright/gui/paths.py` - Platform paths module
+6. `src/antidetect_launcher/gui/paths.py` - Platform paths module
 7. `migrate_data.py` - Migration tool
 
 ---

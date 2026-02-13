@@ -1,5 +1,5 @@
 # 🏆 ФИНАЛЬНЫЙ ОТЧЕТ О ДОСТИЖЕНИЯХ
-## Antidetect Browser Launcher - Team Perfection Project
+## Antidetect Launcher Launcher - Team Perfection Project
 
 **Дата:** 2026-02-08  
 **Команда:** antidetect-launcher-perfection (10 агентов)  
@@ -136,7 +136,7 @@
 - `build/validate_build.py` - Build validation
 
 **Auto-Update:**
-- `src/antidetect_playwright/gui/updater.py` - Full implementation
+- `src/antidetect_launcher/gui/updater.py` - Full implementation
 - SHA256 verification
 - Download manager
 - Platform detection
@@ -175,8 +175,8 @@
 - ✅ Permission system
 
 **Installation Paths:**
-- App: `/opt/antidetect-browser/`
-- Executables: `/usr/bin/antidetect-browser`
+- App: `/opt/antidetect-launcher/`
+- Executables: `/usr/bin/antidetect-launcher`
 - Desktop: `/usr/share/applications/`
 - Icons: `/usr/share/icons/hicolor/`
 
@@ -202,12 +202,12 @@
 ### Fixes (platform-engineer):
 
 **1. File Permissions (CRITICAL FIX)**
-- `src/antidetect_playwright/gui/security.py`
+- `src/antidetect_launcher/gui/security.py`
 - Unix: `chmod` with `stat` module
 - Windows: `icacls` for ACL with fallback
 
 **2. HiDPI/Retina Support (CRITICAL FIX)**
-- `src/antidetect_playwright/gui/app.py`
+- `src/antidetect_launcher/gui/app.py`
 - Qt High DPI attributes
 - Per-monitor V2 DPI awareness
 
@@ -346,7 +346,7 @@ pytest --cov=src --cov-report=html  # Coverage report
 - Plus validation and testing scripts
 
 **Auto-Update System:**
-- `src/antidetect_playwright/updater.py`
+- `src/antidetect_launcher/updater.py`
 - Update checker
 - SHA256 verification
 - Download manager
@@ -434,8 +434,8 @@ pytest --cov=src --cov-report=html  # Coverage report
 .\build\build_windows.ps1
 
 # Output
-dist\AntidetectBrowser-Setup-0.1.0.exe
-dist\AntidetectBrowser-Portable-0.1.0.zip
+dist\AntidetectLauncher-Setup-0.1.0.exe
+dist\AntidetectLauncher-Portable-0.1.0.zip
 ```
 
 ### Linux:
@@ -444,7 +444,7 @@ dist\AntidetectBrowser-Portable-0.1.0.zip
 ./build/scripts/build_deb.sh build
 
 # Install
-sudo dpkg -i build/debian/antidetect-browser_0.1.0-1_amd64.deb
+sudo dpkg -i build/debian/antidetect-launcher_0.1.0-1_amd64.deb
 ```
 
 ### Testing:

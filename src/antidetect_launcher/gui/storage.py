@@ -57,9 +57,9 @@ class Storage:
         Args:
             data_dir: Custom data directory path. If None, uses platform-specific default:
                 - Development: ./data/
-                - Linux installed: ~/.local/share/antidetect-browser/
-                - Windows installed: %APPDATA%/AntidetectBrowser/
-                - macOS installed: ~/Library/Application Support/AntidetectBrowser/
+                - Linux installed: ~/.local/share/antidetect-launcher/
+                - Windows installed: %APPDATA%/AntidetectLauncher/
+                - macOS installed: ~/Library/Application Support/AntidetectLauncher/
         """
         if data_dir is None:
             self._data_dir = get_data_dir()

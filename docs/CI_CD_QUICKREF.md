@@ -12,7 +12,7 @@ pytest tests/
 ruff check src/
 
 # Type check
-mypy src/antidetect_playwright
+mypy src/antidetect_launcher
 
 # Format code
 ruff format src/
@@ -57,7 +57,7 @@ python scripts/bump_version.py 1.2.3
 python scripts/bump_version.py minor
 
 # 2. Commit and tag
-git add pyproject.toml antidetect-browser.spec
+git add pyproject.toml antidetect-launcher.spec
 git commit -m "Bump version to 0.2.0"
 git tag -a v0.2.0 -m "Release v0.2.0"
 
@@ -73,19 +73,19 @@ git push origin v0.2.0
 ### Linux
 ```bash
 ./scripts/build_deb.sh
-sudo dpkg -i dist/antidetect-browser_*.deb
+sudo dpkg -i dist/antidetect-launcher_*.deb
 ```
 
 ### Windows
 ```powershell
 python scripts/build_installer.py
-dist\AntidetectBrowser-Setup-*.exe
+dist\AntidetectLauncher-Setup-*.exe
 ```
 
 ### macOS
 ```bash
 ./scripts/build_dmg.sh
-open dist/AntidetectBrowser-macOS-*.dmg
+open dist/AntidetectLauncher-macOS-*.dmg
 ```
 
 ## CI/CD Workflows

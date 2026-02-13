@@ -2,7 +2,7 @@
 # All values are required - missing values cause startup failure
 
 [application]
-name = "antidetect-playwright"
+name = "antidetect-launcher"
 version = "0.1.0"
 environment = "development"
 

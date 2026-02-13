@@ -1,4 +1,4 @@
-# 🎯 Team Completion Report - Antidetect Browser Launcher
+# 🎯 Team Completion Report - Antidetect Launcher Launcher
 
 **Date:** 2026-02-08
 **Team:** antidetect-launcher-perfection
@@ -43,10 +43,10 @@
 ### 2. UI/UX Улучшения (ux-developer) ✅
 
 **Измененные файлы:**
-- `src/antidetect_playwright/gui/theme.py`
-- `src/antidetect_playwright/gui/styles.py`
-- `src/antidetect_playwright/gui/app.py`
-- `src/antidetect_playwright/gui/widgets.py`
+- `src/antidetect_launcher/gui/theme.py`
+- `src/antidetect_launcher/gui/styles.py`
+- `src/antidetect_launcher/gui/app.py`
+- `src/antidetect_launcher/gui/widgets.py`
 
 **Реализовано:**
 - ✅ **Theme consolidation** - единый source of truth
@@ -89,10 +89,10 @@
 ### 4. Performance Оптимизация (perf-optimizer) ✅
 
 **Измененные файлы:**
-- `src/antidetect_playwright/gui/app.py`
-- `src/antidetect_playwright/gui/widgets.py`
-- `src/antidetect_playwright/gui/launcher.py`
-- `src/antidetect_playwright/gui/storage.py`
+- `src/antidetect_launcher/gui/app.py`
+- `src/antidetect_launcher/gui/widgets.py`
+- `src/antidetect_launcher/gui/launcher.py`
+- `src/antidetect_launcher/gui/storage.py`
 
 **Реализовано:**
 - ✅ **Incremental table updates** - 8x improvement (500-800ms → 50-100ms)
@@ -116,7 +116,7 @@
 - `build/windows_manifest.xml` - DPI awareness
 - `build/generate_icons.py` - Icon generation
 - `build/validate_build.py` - Build validation
-- `src/antidetect_playwright/gui/updater.py` - Auto-update
+- `src/antidetect_launcher/gui/updater.py` - Auto-update
 - `build/README_WINDOWS.md` - Documentation (400+ lines)
 - `build/QUICKSTART_WINDOWS.md` - Quick start
 
@@ -133,7 +133,7 @@
 **Usage:**
 ```powershell
 .\build\build_windows.ps1
-# Output: dist\AntidetectBrowser-Setup-0.1.0.exe
+# Output: dist\AntidetectLauncher-Setup-0.1.0.exe
 ```
 
 ---
@@ -159,10 +159,10 @@ debian/
 - `build/scripts/test_deb.sh` - Package testing
 
 **Installation paths:**
-- App: `/opt/antidetect-browser/`
-- Desktop: `/usr/share/applications/antidetect-browser.desktop`
+- App: `/opt/antidetect-launcher/`
+- Desktop: `/usr/share/applications/antidetect-launcher.desktop`
 - Icons: `/usr/share/icons/hicolor/*/apps/`
-- Executables: `/usr/bin/antidetect-browser`
+- Executables: `/usr/bin/antidetect-launcher`
 
 **Features:**
 - ✅ Production-ready .deb package
@@ -176,7 +176,7 @@ debian/
 **Usage:**
 ```bash
 ./build/scripts/build_deb.sh build
-sudo dpkg -i build/debian/antidetect-browser_0.1.0-1_amd64.deb
+sudo dpkg -i build/debian/antidetect-launcher_0.1.0-1_amd64.deb
 ```
 
 ---
@@ -191,12 +191,12 @@ sudo dpkg -i build/debian/antidetect-browser_0.1.0-1_amd64.deb
 **Исправленные проблемы:**
 
 **1. File Permissions (CRITICAL)**
-- `src/antidetect_playwright/gui/security.py`
+- `src/antidetect_launcher/gui/security.py`
 - Unix: используется `chmod` с `stat`
 - Windows: используется `icacls` для ACL
 
 **2. HiDPI Support (CRITICAL)**
-- `src/antidetect_playwright/gui/app.py`
+- `src/antidetect_launcher/gui/app.py`
 - Added Qt High DPI attributes
 - Per-monitor V2 DPI awareness
 
@@ -261,7 +261,7 @@ tests/
 
 **Usage:**
 ```bash
-pytest tests/ -v --cov=src/antidetect_playwright
+pytest tests/ -v --cov=src/antidetect_launcher
 ```
 
 ---

@@ -1,7 +1,7 @@
 @echo off
 REM Quick setup script for Windows
 
-echo === Antidetect Playwright Setup ===
+echo === Antidetect Launcher Setup ===
 echo.
 
 REM Check Python version
@@ -36,7 +36,7 @@ echo Upgrading pip, setuptools, wheel...
 python -m pip install --upgrade pip setuptools wheel
 
 REM Install package with GUI
-echo Installing antidetect-playwright with GUI dependencies...
+echo Installing antidetect-launcher with GUI dependencies...
 pip install -e ".[gui]"
 if errorlevel 1 (
     echo ERROR: Failed to install dependencies.
@@ -57,7 +57,7 @@ echo === Setup complete! ===
 echo.
 echo To start the GUI:
 echo   .venv\Scripts\activate
-echo   antidetect-browser
+echo   antidetect-launcher
 echo.
 echo On first launch, Camoufox browser will be downloaded automatically.
 echo.

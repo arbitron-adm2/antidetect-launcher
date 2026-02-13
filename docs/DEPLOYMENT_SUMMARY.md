@@ -1,6 +1,6 @@
 # CI/CD Automation - Complete Summary
 
-Comprehensive CI/CD pipeline for Antidetect Browser with automated builds, testing, and deployment.
+Comprehensive CI/CD pipeline for Antidetect Launcher with automated builds, testing, and deployment.
 
 ## Overview
 
@@ -45,7 +45,7 @@ scripts/
 ### Application Code
 
 ```
-src/antidetect_playwright/
+src/antidetect_launcher/
 └── updater.py       # Auto-update checker module
 ```
 
@@ -108,8 +108,8 @@ docs/
   6. Upload artifacts
 
 **Output:**
-- `AntidetectBrowser-Setup-{version}.exe` (installer)
-- `AntidetectBrowser-Windows-x64.zip` (portable)
+- `AntidetectLauncher-Setup-{version}.exe` (installer)
+- `AntidetectLauncher-Windows-x64.zip` (portable)
 
 #### build-linux
 - Platform: Ubuntu Latest
@@ -123,8 +123,8 @@ docs/
   7. Upload artifacts
 
 **Output:**
-- `antidetect-browser_{version}_amd64.deb`
-- `AntidetectBrowser-Linux-x64.tar.gz`
+- `antidetect-launcher_{version}_amd64.deb`
+- `AntidetectLauncher-Linux-x64.tar.gz`
 
 #### build-macos
 - Platform: macOS Latest
@@ -136,7 +136,7 @@ docs/
   5. Upload artifacts
 
 **Output:**
-- `AntidetectBrowser-macOS-{version}.dmg`
+- `AntidetectLauncher-macOS-{version}.dmg`
 
 #### create-release
 - Platform: Ubuntu
@@ -217,8 +217,8 @@ docs/
   "release_notes_url": "https://github.com/.../releases/tag/v0.2.0",
   "platforms": {
     "windows": {
-      "url": "https://github.com/.../AntidetectBrowser-Setup-0.2.0.exe",
-      "filename": "AntidetectBrowser-Setup-0.2.0.exe",
+      "url": "https://github.com/.../AntidetectLauncher-Setup-0.2.0.exe",
+      "filename": "AntidetectLauncher-Setup-0.2.0.exe",
       "size": 52428800,
       "sha256": "abc123...",
       "type": "installer"
@@ -238,7 +238,7 @@ The `updater.py` module provides:
 **Usage in application:**
 
 ```python
-from antidetect_playwright.updater import UpdateChecker
+from antidetect_launcher.updater import UpdateChecker
 
 updater = UpdateChecker("0.1.0", data_dir)
 update_info = await updater.check_for_updates()
@@ -261,7 +261,7 @@ if update_info:
 python scripts/bump_version.py minor  # 0.1.0 -> 0.2.0
 
 # 2. Commit and tag
-git add pyproject.toml antidetect-browser.spec
+git add pyproject.toml antidetect-launcher.spec
 git commit -m "Bump version to 0.2.0"
 git tag -a v0.2.0 -m "Release v0.2.0"
 
@@ -294,9 +294,9 @@ python scripts/generate_changelog.py 0.2.0 > CHANGELOG.md
 gh release create v0.2.0 \
   --title "Release v0.2.0" \
   --notes-file CHANGELOG.md \
-  dist/AntidetectBrowser-Setup-*.exe \
-  dist/antidetect-browser_*.deb \
-  dist/AntidetectBrowser-macOS-*.dmg
+  dist/AntidetectLauncher-Setup-*.exe \
+  dist/antidetect-launcher_*.deb \
+  dist/AntidetectLauncher-macOS-*.dmg
 ```
 
 ---
@@ -322,7 +322,7 @@ python scripts/bump_version.py 2.0.0
 ### Files Updated
 
 - `pyproject.toml` - Project metadata version
-- `antidetect-browser.spec` - macOS bundle version
+- `antidetect-launcher.spec` - macOS bundle version
 
 ### Version Format
 
@@ -341,8 +341,8 @@ Follows Semantic Versioning (SemVer):
 ./scripts/build_local.sh
 
 # Output:
-# - dist/AntidetectBrowser/  (Linux/Windows)
-# - dist/AntidetectBrowser.app  (macOS)
+# - dist/AntidetectLauncher/  (Linux/Windows)
+# - dist/AntidetectLauncher.app  (macOS)
 ```
 
 ### Clean Build
@@ -375,7 +375,7 @@ python scripts/build_installer.py
 pytest tests/
 
 # With coverage
-pytest tests/ --cov=src/antidetect_playwright
+pytest tests/ --cov=src/antidetect_launcher
 
 # Integration tests only
 pytest tests/integration/
@@ -449,7 +449,7 @@ GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Auto-provided
 
 ```bash
 # Data directory
-export ANTIDETECT_DATA_DIR="$HOME/.antidetect-browser"
+export ANTIDETECT_DATA_DIR="$HOME/.antidetect-launcher"
 
 # Update check interval (seconds)
 export ANTIDETECT_UPDATE_CHECK_INTERVAL=3600
@@ -466,7 +466,7 @@ export ANTIDETECT_DISABLE_UPDATE=1
 
 **PyInstaller module not found:**
 ```bash
-# Add to antidetect-browser.spec hiddenimports
+# Add to antidetect-launcher.spec hiddenimports
 ```
 
 **Icon generation fails:**
@@ -506,21 +506,21 @@ chmod +x scripts/*.sh
 - Requires NSIS for installer creation
 - Install: `choco install nsis`
 - Installer creates registry entries
-- User data: `%LOCALAPPDATA%\AntidetectBrowser`
+- User data: `%LOCALAPPDATA%\AntidetectLauncher`
 
 ### Linux
 
 - Requires Qt6 libraries
 - .deb package handles dependencies
 - Desktop file integration
-- User data: `~/.local/share/antidetect-browser`
+- User data: `~/.local/share/antidetect-launcher`
 
 ### macOS
 
 - Requires Xcode Command Line Tools
 - .app bundle code signing (optional)
 - .dmg drag-and-drop installer
-- User data: `~/Library/Application Support/AntidetectBrowser`
+- User data: `~/Library/Application Support/AntidetectLauncher`
 
 ---
 

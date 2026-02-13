@@ -1,6 +1,6 @@
 # Configuration and User Data Storage
 
-This document describes where Antidetect Browser Launcher stores configuration, user profiles, and application data.
+This document describes where Antidetect Launcher Launcher stores configuration, user profiles, and application data.
 
 ## Storage Directory
 
@@ -17,19 +17,19 @@ The application uses **platform-specific data directories** that follow operatin
 
 **Linux:**
 ```
-~/.local/share/antidetect-browser/
+~/.local/share/antidetect-launcher/
 ```
 Following XDG Base Directory specification. Can be overridden with `XDG_DATA_HOME`.
 
 **Windows:**
 ```
-%APPDATA%\AntidetectBrowser\
+%APPDATA%\AntidetectLauncher\
 ```
-Typically: `C:\Users\{username}\AppData\Roaming\AntidetectBrowser\`
+Typically: `C:\Users\{username}\AppData\Roaming\AntidetectLauncher\`
 
 **macOS:**
 ```
-~/Library/Application Support/AntidetectBrowser/
+~/Library/Application Support/AntidetectLauncher/
 ```
 
 ### How Detection Works
@@ -39,7 +39,7 @@ The application automatically detects if it's running:
 2. **As PyInstaller bundle** → uses platform-specific path
 3. **As installed package** (from `/usr/bin`, `/opt`, etc.) → uses platform-specific path
 
-**Implementation:** `src/antidetect_playwright/gui/paths.py:get_data_dir()`
+**Implementation:** `src/antidetect_launcher/gui/paths.py:get_data_dir()`
 
 ## Migrating Existing Data
 
@@ -61,17 +61,17 @@ This will:
 
 **Linux:**
 ```bash
-cp -r data/ ~/.local/share/antidetect-browser/
+cp -r data/ ~/.local/share/antidetect-launcher/
 ```
 
 **Windows (PowerShell):**
 ```powershell
-Copy-Item -Recurse data\ $env:APPDATA\AntidetectBrowser\
+Copy-Item -Recurse data\ $env:APPDATA\AntidetectLauncher\
 ```
 
 **macOS:**
 ```bash
-cp -r data/ ~/Library/Application\ Support/AntidetectBrowser/
+cp -r data/ ~/Library/Application\ Support/AntidetectLauncher/
 ```
 
 ---
@@ -500,7 +500,7 @@ rm -rf data/
 ## Code References
 
 ### Main Storage Class
-- **File:** `src/antidetect_playwright/gui/storage.py`
+- **File:** `src/antidetect_launcher/gui/storage.py`
 - **Class:** `Storage`
 - **Initialization:** Line 53
 - **Profile CRUD:** Lines 374-500
@@ -511,11 +511,11 @@ rm -rf data/
 - **Trash:** Lines 706-750
 
 ### Constants
-- **File:** `src/antidetect_playwright/gui/constants.py`
+- **File:** `src/antidetect_launcher/gui/constants.py`
 - **Data paths:** Lines 39-40
 
 ### Security
-- **File:** `src/antidetect_playwright/gui/security.py`
+- **File:** `src/antidetect_launcher/gui/security.py`
 - **Encryption:** `SecurePasswordEncryption` class
 - **Validation:** `validate_uuid()`, `sanitize_path_component()`
 

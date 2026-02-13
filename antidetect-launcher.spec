@@ -1,5 +1,5 @@
 # -*- mode: python ; coding: utf-8 -*-
-"""PyInstaller spec for Antidetect Browser GUI."""
+"""PyInstaller spec for Antidetect Launcher GUI."""
 
 import sys
 from pathlib import Path
@@ -10,7 +10,7 @@ block_cipher = None
 # Project paths
 project_root = Path(SPECPATH)
 src_dir = project_root / "src"
-resources_dir = src_dir / "antidetect_playwright/resources"
+resources_dir = src_dir / "antidetect_launcher/resources"
 icon_path = project_root / "build/icons"
 
 # Find browserforge data directory
@@ -36,12 +36,12 @@ datas = []
 for res in ("chrome", "icon.svg", "app-icon-256.svg", "tray-icon.svg", "default_config"):
     p = resources_dir / res
     if p.exists():
-        dest = "antidetect_playwright/resources/" + ("chrome" if res == "chrome" else (
+        dest = "antidetect_launcher/resources/" + ("chrome" if res == "chrome" else (
             "default_config" if res == "default_config" else ""))
         if p.is_dir():
-            datas.append((str(p), f"antidetect_playwright/resources/{res}"))
+            datas.append((str(p), f"antidetect_launcher/resources/{res}"))
         else:
-            datas.append((str(p), "antidetect_playwright/resources"))
+            datas.append((str(p), "antidetect_launcher/resources"))
 
 # External package data (optional — included when present)
 _optional_data = [
@@ -88,7 +88,7 @@ hiddenimports = [
 ]
 
 a = Analysis(
-    [str(src_dir / "antidetect_playwright/gui/launcher_pyinstaller.py")],
+    [str(src_dir / "antidetect_launcher/gui/launcher_pyinstaller.py")],
     pathex=[str(src_dir)],
     binaries=[],
     datas=datas,
@@ -115,7 +115,7 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name='AntidetectBrowser',
+    name='AntidetectLauncher',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -141,19 +141,19 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name='AntidetectBrowser',
+    name='AntidetectLauncher',
 )
 
 # macOS app bundle
 if sys.platform == "darwin":
     app = BUNDLE(
         coll,
-        name='AntidetectBrowser.app',
+        name='AntidetectLauncher.app',
         icon=icon_file,
         bundle_identifier='com.antidetect.browser',
         info_plist={
-            'CFBundleName': 'Antidetect Browser',
-            'CFBundleDisplayName': 'Antidetect Browser',
+            'CFBundleName': 'Antidetect Launcher',
+            'CFBundleDisplayName': 'Antidetect Launcher',
             'CFBundleVersion': '0.1.0',
             'CFBundleShortVersionString': '0.1.0',
             'NSHighResolutionCapable': True,

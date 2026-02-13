@@ -1,4 +1,4 @@
-"""Auto-update mechanism for Antidetect Browser."""
+"""Auto-update mechanism for Antidetect Launcher."""
 
 import json
 import logging
@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 class AutoUpdater:
     """Handles automatic updates for the application."""
 
-    UPDATE_URL = "https://api.github.com/repos/antidetect/antidetect-playwright/releases/latest"
+    UPDATE_URL = "https://api.github.com/repos/antidetect/antidetect-launcher/releases/latest"
     CURRENT_VERSION = "0.1.0"
 
     def __init__(self, check_on_startup: bool = True):
@@ -97,10 +97,10 @@ class AutoUpdater:
 
         try:
             # Create temporary file for download
-            temp_dir = Path(tempfile.gettempdir()) / "antidetect-browser-updates"
+            temp_dir = Path(tempfile.gettempdir()) / "antidetect-launcher-updates"
             temp_dir.mkdir(exist_ok=True)
 
-            installer_name = f"AntidetectBrowser-Setup-{self._latest_version}.exe"
+            installer_name = f"AntidetectLauncher-Setup-{self._latest_version}.exe"
             installer_path = temp_dir / installer_name
 
             # Download file
@@ -209,7 +209,7 @@ class AutoUpdater:
             for hive in [winreg.HKEY_CURRENT_USER, winreg.HKEY_LOCAL_MACHINE]:
                 try:
                     key = winreg.OpenKey(
-                        hive, r"Software\Antidetect Team\Antidetect Browser"
+                        hive, r"Software\Antidetect Team\Antidetect Launcher"
                     )
                     value, _ = winreg.QueryValueEx(key, "AutoUpdate")
                     winreg.CloseKey(key)
@@ -242,7 +242,7 @@ class AutoUpdater:
             # Save to HKCU
             key = winreg.CreateKey(
                 winreg.HKEY_CURRENT_USER,
-                r"Software\Antidetect Team\Antidetect Browser"
+                r"Software\Antidetect Team\Antidetect Launcher"
             )
             winreg.SetValueEx(key, "AutoUpdate", 0, winreg.REG_DWORD, int(enabled))
             winreg.CloseKey(key)

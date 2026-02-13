@@ -36,9 +36,9 @@ ALL TESTS PASSED ✓
 
 ### Modified Files
 
-1. `src/antidetect_playwright/gui/security.py` - Cross-platform permissions
-2. `src/antidetect_playwright/gui/app.py` - HiDPI support
-3. `antidetect-browser.spec` - Windows manifest integration
+1. `src/antidetect_launcher/gui/security.py` - Cross-platform permissions
+2. `src/antidetect_launcher/gui/app.py` - HiDPI support
+3. `antidetect-launcher.spec` - Windows manifest integration
 
 ## Platform Support Matrix
 

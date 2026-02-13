@@ -104,7 +104,7 @@ class MainWindow(QMainWindow):
 
     def _setup_ui(self):
         """Setup main UI structure."""
-        self.setWindowTitle("Antidetect Browser")
+        self.setWindowTitle("Antidetect Launcher")
         self.setMinimumSize(1200, 700)
 
         # Set application icon (works in dev, pip, and PyInstaller modes)
@@ -1313,7 +1313,7 @@ class MainWindow(QMainWindow):
             event.ignore()
             self.hide()
             self._tray.show_message(
-                "Antidetect Browser",
+                "Antidetect Launcher",
                 "Application minimized to tray. Right-click tray icon → Quit to exit.",
             )
             return
@@ -1356,8 +1356,8 @@ def main():
     # Install secure logging filter to prevent credential leaks
     install_secure_logging()
 
-    from antidetect_playwright.config import load_config
-    from antidetect_playwright.gui.paths import ensure_config_files
+    from antidetect_launcher.config import load_config
+    from antidetect_launcher.gui.paths import ensure_config_files
 
     config_dir = os.environ.get("APP_CONFIG_DIR") or str(ensure_config_files())
     config = load_config(config_dir)

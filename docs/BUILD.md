@@ -1,6 +1,6 @@
 # Build & Deployment Guide
 
-Complete guide for building and deploying Antidetect Browser across platforms.
+Complete guide for building and deploying Antidetect Launcher across platforms.
 
 ## Table of Contents
 
@@ -50,9 +50,9 @@ scripts\build.bat
 ```
 
 Output:
-- Linux: `dist/AntidetectBrowser/AntidetectBrowser`
-- macOS: `dist/AntidetectBrowser.app`
-- Windows: `dist/AntidetectBrowser/AntidetectBrowser.exe`
+- Linux: `dist/AntidetectLauncher/AntidetectLauncher`
+- macOS: `dist/AntidetectLauncher.app`
+- Windows: `dist/AntidetectLauncher/AntidetectLauncher.exe`
 
 ### Build Distributable Package
 
@@ -99,16 +99,16 @@ sudo apt-get install -y \
 
 #### Install Package
 ```bash
-sudo dpkg -i dist/antidetect-browser_0.1.0_amd64.deb
+sudo dpkg -i dist/antidetect-launcher_0.1.0_amd64.deb
 sudo apt-get install -f  # Fix dependencies
 ```
 
 #### Package Contents
-- Binary: `/opt/antidetect-browser/AntidetectBrowser`
-- Launcher: `/usr/bin/antidetect-browser`
-- Desktop file: `/usr/share/applications/antidetect-browser.desktop`
-- Icon: `/usr/share/pixmaps/antidetect-browser.png`
-- User data: `~/.local/share/antidetect-browser/data/`
+- Binary: `/opt/antidetect-launcher/AntidetectLauncher`
+- Launcher: `/usr/bin/antidetect-launcher`
+- Desktop file: `/usr/share/applications/antidetect-launcher.desktop`
+- Icon: `/usr/share/pixmaps/antidetect-launcher.png`
+- User data: `~/.local/share/antidetect-launcher/data/`
 
 ### Windows (.exe)
 
@@ -130,10 +130,10 @@ python scripts/build_installer.py
 ```
 
 #### Installer Features
-- Installs to `C:\Program Files\AntidetectBrowser`
+- Installs to `C:\Program Files\AntidetectLauncher`
 - Creates Desktop and Start Menu shortcuts
 - Adds to Windows Registry (uninstall support)
-- User data in `%LOCALAPPDATA%\AntidetectBrowser\data\`
+- User data in `%LOCALAPPDATA%\AntidetectLauncher\data\`
 
 ### macOS (.dmg)
 
@@ -154,10 +154,10 @@ xcode-select --install
 
 #### App Bundle Structure
 ```
-AntidetectBrowser.app/
+AntidetectLauncher.app/
 ├── Contents/
 │   ├── MacOS/
-│   │   └── AntidetectBrowser
+│   │   └── AntidetectLauncher
 │   ├── Resources/
 │   ├── Info.plist
 │   └── ...
@@ -219,7 +219,7 @@ python scripts/bump_version.py 1.2.3
 
 This updates:
 - `pyproject.toml` - Project version
-- `antidetect-browser.spec` - PyInstaller bundle version
+- `antidetect-launcher.spec` - PyInstaller bundle version
 
 ### Version Files
 
@@ -244,7 +244,7 @@ python scripts/bump_version.py minor
 
 2. **Commit and tag**
 ```bash
-git add pyproject.toml antidetect-browser.spec
+git add pyproject.toml antidetect-launcher.spec
 git commit -m "Bump version to 0.2.0"
 git tag -a v0.2.0 -m "Release v0.2.0"
 ```
@@ -278,9 +278,9 @@ python scripts/generate_changelog.py 0.2.0 > CHANGELOG.md
 gh release create v0.2.0 \
     --title "Release v0.2.0" \
     --notes-file CHANGELOG.md \
-    dist/AntidetectBrowser-Setup-*.exe \
-    dist/antidetect-browser_*.deb \
-    dist/AntidetectBrowser-macOS-*.dmg
+    dist/AntidetectLauncher-Setup-*.exe \
+    dist/antidetect-launcher_*.deb \
+    dist/AntidetectLauncher-macOS-*.dmg
 ```
 
 ---
@@ -295,22 +295,22 @@ Generated automatically on release:
 {
   "version": "0.2.0",
   "release_date": "2024-01-15",
-  "release_notes_url": "https://github.com/antidetect/antidetect-playwright/releases/tag/v0.2.0",
+  "release_notes_url": "https://github.com/antidetect/antidetect-launcher/releases/tag/v0.2.0",
   "platforms": {
     "windows": {
-      "url": "https://github.com/.../AntidetectBrowser-Setup-0.2.0.exe",
+      "url": "https://github.com/.../AntidetectLauncher-Setup-0.2.0.exe",
       "sha256": "abc123...",
       "size": 52428800,
       "type": "installer"
     },
     "linux": {
-      "url": "https://github.com/.../antidetect-browser_0.2.0_amd64.deb",
+      "url": "https://github.com/.../antidetect-launcher_0.2.0_amd64.deb",
       "sha256": "def456...",
       "size": 48234567,
       "type": "deb"
     },
     "macos": {
-      "url": "https://github.com/.../AntidetectBrowser-macOS-0.2.0.dmg",
+      "url": "https://github.com/.../AntidetectLauncher-macOS-0.2.0.dmg",
       "sha256": "ghi789...",
       "size": 51234567,
       "type": "dmg"
@@ -322,7 +322,7 @@ Generated automatically on release:
 ### Integration in Application
 
 ```python
-from antidetect_playwright.updater import UpdateChecker
+from antidetect_launcher.updater import UpdateChecker
 
 # Initialize
 updater = UpdateChecker("0.1.0", data_dir)
@@ -343,7 +343,7 @@ if update_info:
 
 ### Update Manifest Location
 
-- Production: `https://raw.githubusercontent.com/antidetect/antidetect-playwright/main/update-manifest.json`
+- Production: `https://raw.githubusercontent.com/antidetect/antidetect-launcher/main/update-manifest.json`
 - Development: Local file system
 
 ---
@@ -392,7 +392,7 @@ export NSIS_PATH="C:\Program Files (x86)\NSIS\makensis.exe"
 
 ```bash
 # Data directory override
-export ANTIDETECT_DATA_DIR="$HOME/.antidetect-browser"
+export ANTIDETECT_DATA_DIR="$HOME/.antidetect-launcher"
 
 # Update check interval (seconds)
 export ANTIDETECT_UPDATE_CHECK_INTERVAL=3600
@@ -409,7 +409,7 @@ export ANTIDETECT_DISABLE_UPDATE=1
 
 #### PyInstaller "Module not found"
 ```bash
-# Add to hiddenimports in antidetect-browser.spec
+# Add to hiddenimports in antidetect-launcher.spec
 hiddenimports = [
     'missing_module',
 ]
@@ -448,7 +448,7 @@ choco install nsis
 #### macOS code signing
 ```bash
 # For development, allow unsigned apps
-xattr -cr dist/AntidetectBrowser.app
+xattr -cr dist/AntidetectLauncher.app
 ```
 
 ---
@@ -483,6 +483,6 @@ xattr -cr dist/AntidetectBrowser.app
 
 ## Support
 
-- **Issues**: https://github.com/antidetect/antidetect-playwright/issues
-- **Documentation**: https://github.com/antidetect/antidetect-playwright/docs
-- **Releases**: https://github.com/antidetect/antidetect-playwright/releases
+- **Issues**: https://github.com/antidetect/antidetect-launcher/issues
+- **Documentation**: https://github.com/antidetect/antidetect-launcher/docs
+- **Releases**: https://github.com/antidetect/antidetect-launcher/releases

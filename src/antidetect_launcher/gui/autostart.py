@@ -1,4 +1,4 @@
-"""Cross-platform autostart management for Antidetect Browser."""
+"""Cross-platform autostart management for Antidetect Launcher."""
 
 import logging
 import os
@@ -7,8 +7,8 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
-APP_NAME = "Antidetect Browser"
-APP_ID = "antidetect-browser"
+APP_NAME = "Antidetect Launcher"
+APP_ID = "antidetect-launcher"
 
 # Linux autostart desktop entry template
 _LINUX_AUTOSTART_TEMPLATE = """[Desktop Entry]
@@ -66,9 +66,9 @@ def _linux_find_exec() -> str:
     """Find the executable path for the .desktop Exec= field."""
     # Check common install locations
     for candidate in [
-        "/usr/bin/antidetect-browser",
-        "/usr/local/bin/antidetect-browser",
-        "/opt/antidetect-browser/AntidetectBrowser",
+        "/usr/bin/antidetect-launcher",
+        "/usr/local/bin/antidetect-launcher",
+        "/opt/antidetect-launcher/AntidetectLauncher",
     ]:
         if Path(candidate).exists():
             return candidate

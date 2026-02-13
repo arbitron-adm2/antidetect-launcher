@@ -41,17 +41,17 @@ jobs:
         python -m playwright install firefox
 
     - name: Build with PyInstaller
-      run: python -m PyInstaller antidetect-browser.spec --clean --noconfirm
+      run: python -m PyInstaller antidetect-launcher.spec --clean --noconfirm
 
     - name: Create portable ZIP
       run: |
-        Compress-Archive -Path dist\AntidetectBrowser -DestinationPath dist\AntidetectBrowser-Windows-x64.zip
+        Compress-Archive -Path dist\AntidetectLauncher -DestinationPath dist\AntidetectLauncher-Windows-x64.zip
 
     - name: Calculate checksum
       shell: pwsh
       run: |
-        $hash = (Get-FileHash dist\AntidetectBrowser-Windows-x64.zip -Algorithm SHA256).Hash
-        "$hash  AntidetectBrowser-Windows-x64.zip" | Out-File -Encoding utf8 dist\checksums-windows.txt
+        $hash = (Get-FileHash dist\AntidetectLauncher-Windows-x64.zip -Algorithm SHA256).Hash
+        "$hash  AntidetectLauncher-Windows-x64.zip" | Out-File -Encoding utf8 dist\checksums-windows.txt
         Get-Content dist\checksums-windows.txt
 
     - name: Upload Windows artifact
@@ -59,7 +59,7 @@ jobs:
       with:
         name: windows-portable
         path: |
-          dist/AntidetectBrowser-Windows-x64.zip
+          dist/AntidetectLauncher-Windows-x64.zip
           dist/checksums-windows.txt
         retention-days: 30
 
@@ -93,13 +93,13 @@ jobs:
         python -m playwright install firefox --with-deps
 
     - name: Build with PyInstaller
-      run: python -m PyInstaller antidetect-browser.spec --clean --noconfirm
+      run: python -m PyInstaller antidetect-launcher.spec --clean --noconfirm
 
     - name: Create tarball
       run: |
         cd dist
-        tar czf AntidetectBrowser-Linux-x86_64.tar.gz AntidetectBrowser/
-        sha256sum AntidetectBrowser-Linux-x86_64.tar.gz > checksums-linux.txt
+        tar czf AntidetectLauncher-Linux-x86_64.tar.gz AntidetectLauncher/
+        sha256sum AntidetectLauncher-Linux-x86_64.tar.gz > checksums-linux.txt
         cat checksums-linux.txt
 
     - name: Upload Linux artifact
@@ -107,7 +107,7 @@ jobs:
       with:
         name: linux-portable
         path: |
-          dist/AntidetectBrowser-Linux-x86_64.tar.gz
+          dist/AntidetectLauncher-Linux-x86_64.tar.gz
           dist/checksums-linux.txt
         retention-days: 30
 
@@ -148,37 +148,37 @@ jobs:
       uses: softprops/action-gh-release@v2
       with:
         tag_name: ${{ steps.version.outputs.TAG }}
-        name: Antidetect Browser v${{ steps.version.outputs.VERSION }}
+        name: Antidetect Launcher v${{ steps.version.outputs.VERSION }}
         draft: false
         prerelease: false
         generate_release_notes: true
         files: |
-          artifacts/AntidetectBrowser-Windows-x64.zip
-          artifacts/AntidetectBrowser-Linux-x86_64.tar.gz
+          artifacts/AntidetectLauncher-Windows-x64.zip
+          artifacts/AntidetectLauncher-Linux-x86_64.tar.gz
           artifacts/checksums-windows.txt
           artifacts/checksums-linux.txt
         body: |
-          ## Antidetect Browser v${{ steps.version.outputs.VERSION }}
+          ## Antidetect Launcher v${{ steps.version.outputs.VERSION }}
 
           ### Downloads
 
           | Platform | File | Description |
           |----------|------|-------------|
-          | Windows  | `AntidetectBrowser-Windows-x64.zip` | Portable (extract & run) |
-          | Linux    | `AntidetectBrowser-Linux-x86_64.tar.gz` | Portable (extract & run) |
+          | Windows  | `AntidetectLauncher-Windows-x64.zip` | Portable (extract & run) |
+          | Linux    | `AntidetectLauncher-Linux-x86_64.tar.gz` | Portable (extract & run) |
 
           ### Installation
 
           **Windows:**
-          1. Download `AntidetectBrowser-Windows-x64.zip`
+          1. Download `AntidetectLauncher-Windows-x64.zip`
           2. Extract to any folder
-          3. Run `AntidetectBrowser.exe`
+          3. Run `AntidetectLauncher.exe`
 
           **Linux:**
           ```bash
-          tar xzf AntidetectBrowser-Linux-x86_64.tar.gz
-          cd AntidetectBrowser
-          ./AntidetectBrowser
+          tar xzf AntidetectLauncher-Linux-x86_64.tar.gz
+          cd AntidetectLauncher
+          ./AntidetectLauncher
           ```
 
           ### Features

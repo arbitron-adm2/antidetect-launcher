@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-Created a **complete testing infrastructure** for antidetect-playwright with 80%+ coverage goal, including:
+Created a **complete testing infrastructure** for antidetect-launcher with 80%+ coverage goal, including:
 - 110+ tests across multiple categories
 - CI/CD integration with GitHub Actions
 - Performance benchmarking framework
@@ -229,7 +229,7 @@ Created a **complete testing infrastructure** for antidetect-playwright with 80%
 **File**: `.coveragerc`
 
 **Settings**:
-- Source: `src/antidetect_playwright`
+- Source: `src/antidetect_launcher`
 - Branch coverage enabled
 - HTML and JSON reports
 - Excludes: tests, vendor, pycache

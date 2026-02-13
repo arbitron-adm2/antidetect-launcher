@@ -153,7 +153,7 @@ class Application:
 )
 @click.pass_context
 def cli(ctx: click.Context, config: str) -> None:
-    """Antidetect Playwright - Stealth browser automation."""
+    """Antidetect Launcher - Stealth browser automation."""
     ctx.ensure_object(dict)
     ctx.obj["config_dir"] = config
 

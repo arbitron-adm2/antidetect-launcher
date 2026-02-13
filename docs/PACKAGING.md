@@ -1,6 +1,6 @@
 # Packaging Structure
 
-This directory contains all packaging configurations for Antidetect Browser.
+This directory contains all packaging configurations for Antidetect Launcher.
 
 ## Directory Structure
 
@@ -13,7 +13,7 @@ build/
 │   ├── build_all_linux.sh    # Build all Linux packages
 │   └── test_deb.sh           # Test DEB package
 ├── linux/
-│   └── antidetect-browser.desktop  # Desktop file
+│   └── antidetect-launcher.desktop  # Desktop file
 └── icons/
     └── linux/                # Icon files
 
@@ -42,10 +42,10 @@ debian/
 ./build/scripts/build_deb.sh build
 
 # Test
-./build/scripts/test_deb.sh build/debian/antidetect-browser_0.1.0-1_amd64.deb
+./build/scripts/test_deb.sh build/debian/antidetect-launcher_0.1.0-1_amd64.deb
 
 # Install
-sudo dpkg -i build/debian/antidetect-browser_0.1.0-1_amd64.deb
+sudo dpkg -i build/debian/antidetect-launcher_0.1.0-1_amd64.deb
 ```
 
 ### AppImage
@@ -55,8 +55,8 @@ sudo dpkg -i build/debian/antidetect-browser_0.1.0-1_amd64.deb
 ./build/scripts/build_appimage.sh
 
 # Run
-chmod +x build/appimage/AntidetectBrowser-0.1.0-x86_64.AppImage
-./build/appimage/AntidetectBrowser-0.1.0-x86_64.AppImage
+chmod +x build/appimage/AntidetectLauncher-0.1.0-x86_64.AppImage
+./build/appimage/AntidetectLauncher-0.1.0-x86_64.AppImage
 ```
 
 ### Flatpak
@@ -83,14 +83,14 @@ flatpak run com.antidetect.Browser
 ## Installation Paths
 
 ### DEB Package
-- Application: `/opt/antidetect-browser/`
-- Executables: `/usr/bin/antidetect-browser`
-- Data: `/var/lib/antidetect-browser/`
-- Config: `/etc/antidetect-browser/`
+- Application: `/opt/antidetect-launcher/`
+- Executables: `/usr/bin/antidetect-launcher`
+- Data: `/var/lib/antidetect-launcher/`
+- Config: `/etc/antidetect-launcher/`
 
 ### AppImage
 - Self-contained in AppImage file
-- User data: `~/.config/antidetect-browser/`
+- User data: `~/.config/antidetect-launcher/`
 
 ### Flatpak
 - App: `/var/lib/flatpak/app/com.antidetect.Browser/`
@@ -149,8 +149,8 @@ Artifacts uploaded for each build.
 docker run -it ubuntu:22.04 bash
 # Inside container:
 apt-get update
-apt-get install -y ./antidetect-browser_0.1.0-1_amd64.deb
-antidetect-browser
+apt-get install -y ./antidetect-launcher_0.1.0-1_amd64.deb
+antidetect-launcher
 ```
 
 ## Publishing
@@ -170,5 +170,5 @@ Snap packaging coming soon.
 ## Support
 
 For packaging issues:
-- GitHub Issues: https://github.com/antidetect/antidetect-playwright/issues
+- GitHub Issues: https://github.com/antidetect/antidetect-launcher/issues
 - Tag: `packaging`, `linux`

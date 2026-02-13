@@ -1,4 +1,4 @@
-# UX/UI Analysis Report - Antidetect Browser Launcher
+# UX/UI Analysis Report - Antidetect Launcher Launcher
 **Date:** 2026-02-08
 **Analyst:** UX/UI Expert
 **Status:** Comprehensive Audit Complete
@@ -35,7 +35,7 @@ This antidetect browser launcher presents a **solid foundation** with a Dolphin 
 
 **CRITICAL ISSUE: Theme Duplication**
 
-**Location:** `/home/fsdf1234/Projects/antidetect-playwright/src/antidetect_playwright/gui/theme.py` vs `styles.py`
+**Location:** `/home/fsdf1234/Projects/antidetect-launcher/src/antidetect_launcher/gui/theme.py` vs `styles.py`
 
 The codebase has **two competing theme systems**:
 - **theme.py** (Lines 7-95): Structured dataclasses with `Colors`, `Typography`, `Spacing`, `BorderRadius`
@@ -187,14 +187,14 @@ Apply consistently:
 - ✅ Persists window size/position (lines 84-86, 1129-1133)
 
 **Issues:**
-1. **Line 90:** Window title "Antidetect Browser" lacks version info
+1. **Line 90:** Window title "Antidetect Launcher" lacks version info
 2. **Line 91:** Minimum size 1200x700 is large - excludes smaller screens
 3. **Lines 1117-1124:** Auto-collapse threshold (1400px/1500px) needs user testing
 
 **Recommendation:**
 ```python
 # Add version to title
-self.setWindowTitle(f"Antidetect Browser v{__version__}")
+self.setWindowTitle(f"Antidetect Launcher v{__version__}")
 
 # Reduce minimum size
 self.setMinimumSize(1024, 600)  # More inclusive
@@ -1149,7 +1149,7 @@ btn.setProperty("class", "primary")
 
 ## Conclusion
 
-The Antidetect Browser Launcher has a **strong design foundation** with modern components and consistent theming. However, **critical inconsistencies** in border-radius, theme duplication, and accessibility gaps need immediate attention.
+The Antidetect Launcher Launcher has a **strong design foundation** with modern components and consistent theming. However, **critical inconsistencies** in border-radius, theme duplication, and accessibility gaps need immediate attention.
 
 **Priority Actions:**
 1. **Week 1:** Consolidate theme system, fix border-radius

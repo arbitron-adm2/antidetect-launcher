@@ -1,6 +1,6 @@
 # 🎉 МИССИЯ ВЫПОЛНЕНА!
 
-## Antidetect Browser Launcher - Perfection Achieved
+## Antidetect Launcher Launcher - Perfection Achieved
 
 **Дата:** 2026-02-08  
 **Команда:** 10 специализированных агентов  
@@ -127,22 +127,22 @@
 ### Запуск приложения:
 ```bash
 # Из source
-antidetect-browser
+antidetect-launcher
 
 # Или
-python -m antidetect_playwright.gui.app
+python -m antidetect_launcher.gui.app
 ```
 
 ### Build Windows:
 ```powershell
 .\build\build_windows.ps1
-# Output: dist\AntidetectBrowser-Setup-0.1.0.exe
+# Output: dist\AntidetectLauncher-Setup-0.1.0.exe
 ```
 
 ### Build Linux:
 ```bash
 ./build/scripts/build_deb.sh build
-# Output: build/debian/antidetect-browser_0.1.0-1_amd64.deb
+# Output: build/debian/antidetect-launcher_0.1.0-1_amd64.deb
 ```
 
 ### Run Tests:

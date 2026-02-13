@@ -1,4 +1,4 @@
-"""Domain models for antidetect-playwright."""
+"""Domain models for antidetect-launcher."""
 
 from .browser_profile import BrowserProfile
 from .fingerprint import (

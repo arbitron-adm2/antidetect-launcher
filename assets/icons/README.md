@@ -1,6 +1,6 @@
 # Application Icons
 
-This directory contains all SVG icons for the Antidetect Browser Launcher application.
+This directory contains all SVG icons for the Antidetect Launcher Launcher application.
 
 ## Main Application Icons
 
@@ -183,17 +183,17 @@ app = BUNDLE(
 Icons are automatically installed via desktop entry:
 ```ini
 [Desktop Entry]
-Icon=antidetect-browser
+Icon=antidetect-launcher
 ```
 
 PNGs are installed to: `/usr/share/icons/hicolor/{size}/apps/`
 
 ## License
 
-These icons are part of the Antidetect Browser Launcher project.
+These icons are part of the Antidetect Launcher Launcher project.
 
 ## Credits
 
-- Design: Custom SVG icons for Antidetect Browser Launcher
+- Design: Custom SVG icons for Antidetect Launcher Launcher
 - Tools: Created with SVG standards, compatible with all modern browsers
 - Optimization: Hand-optimized SVG for minimal file size

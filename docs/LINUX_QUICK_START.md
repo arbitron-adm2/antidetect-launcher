@@ -6,18 +6,18 @@
 # One-step build
 ./build/scripts/build_deb.sh build
 
-# Output: build/debian/antidetect-browser_0.1.0-1_amd64.deb
+# Output: build/debian/antidetect-launcher_0.1.0-1_amd64.deb
 ```
 
 ### Install
 
 ```bash
 # Install DEB
-sudo dpkg -i build/debian/antidetect-browser_0.1.0-1_amd64.deb
+sudo dpkg -i build/debian/antidetect-launcher_0.1.0-1_amd64.deb
 sudo apt-get install -f  # Fix dependencies if needed
 
 # Run
-antidetect-browser
+antidetect-launcher
 ```
 
 ### Alternative Formats
@@ -25,7 +25,7 @@ antidetect-browser
 ```bash
 # Build AppImage (portable)
 ./build/scripts/build_appimage.sh
-./build/appimage/AntidetectBrowser-0.1.0-x86_64.AppImage
+./build/appimage/AntidetectLauncher-0.1.0-x86_64.AppImage
 
 # Build Flatpak (sandboxed)
 ./build/scripts/build_flatpak.sh

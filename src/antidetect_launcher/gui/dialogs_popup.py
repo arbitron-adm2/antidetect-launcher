@@ -1032,7 +1032,7 @@ def show_settings_popup(parent, settings) -> bool:
     autostart_checkbox.setChecked(is_autostart_enabled())
     debug_layout.addRow("Start on login:", autostart_checkbox)
 
-    autostart_help = QLabel("Automatically launch Antidetect Browser when you log in")
+    autostart_help = QLabel("Automatically launch Antidetect Launcher when you log in")
     autostart_help.setStyleSheet(f"color: {COLORS['text_muted']}; font-size: 11px;")
     debug_layout.addRow("", autostart_help)
 

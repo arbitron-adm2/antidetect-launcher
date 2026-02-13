@@ -1,5 +1,5 @@
 # Performance & Stability Audit Report
-**Antidetect Playwright GUI Application**
+**Antidetect Launcher GUI Application**
 
 **Date:** 2026-02-08
 **Auditor:** Performance Analyst Agent
@@ -27,7 +27,7 @@ The application demonstrates solid architectural patterns with proper async/awai
 ## 1. Critical Performance Bottlenecks
 
 ### 🔴 **CRITICAL #1: Full Table Rebuild on Every Update**
-**File:** `src/antidetect_playwright/gui/app.py:266-413`
+**File:** `src/antidetect_launcher/gui/app.py:266-413`
 **Severity:** Critical
 **Impact:** O(n²) complexity, UI freezes with >100 profiles
 
@@ -75,7 +75,7 @@ The `_refresh_table()` method is called from 15+ different locations:
 ---
 
 ### 🔴 **CRITICAL #2: Blocking I/O in GUI Thread**
-**File:** `src/antidetect_playwright/gui/launcher.py:336-552`
+**File:** `src/antidetect_launcher/gui/launcher.py:336-552`
 **Severity:** Critical
 **Impact:** 2-4 second freeze on browser launch
 
@@ -125,7 +125,7 @@ fp_data = await loop.run_in_executor(
 ---
 
 ### 🔴 **CRITICAL #3: N+1 Storage Queries**
-**File:** `src/antidetect_playwright/gui/app.py:415-431`
+**File:** `src/antidetect_launcher/gui/app.py:415-431`
 **Severity:** High
 **Impact:** O(n²) database queries
 
@@ -156,7 +156,7 @@ def _refresh_tags(self):
 ---
 
 ### 🟡 **MODERATE #4: Redundant Profile Index Rebuilds**
-**File:** `src/antidetect_playwright/gui/storage.py:82-84, 310-311`
+**File:** `src/antidetect_launcher/gui/storage.py:82-84, 310-311`
 **Severity:** Moderate
 **Impact:** Unnecessary O(n) operations
 
@@ -183,7 +183,7 @@ def _rebuild_index(self):
 ---
 
 ### 🟡 **MODERATE #5: Widget Memory Leaks**
-**File:** `src/antidetect_playwright/gui/pages/profiles.py:386-409`
+**File:** `src/antidetect_launcher/gui/pages/profiles.py:386-409`
 **Severity:** Moderate
 **Risk:** Memory leak potential
 
@@ -680,7 +680,7 @@ MainWindow (300 lines - coordinator only)
 
 ## 12. Conclusion
 
-The Antidetect Playwright GUI demonstrates **solid engineering fundamentals** with proper async patterns, security considerations, and error handling. However, it suffers from **performance bottlenecks** that will severely impact user experience with larger datasets.
+The Antidetect Launcher GUI demonstrates **solid engineering fundamentals** with proper async patterns, security considerations, and error handling. However, it suffers from **performance bottlenecks** that will severely impact user experience with larger datasets.
 
 **Priority focus areas:**
 1. **UI refresh optimization** (8x improvement potential)
@@ -697,16 +697,16 @@ With the recommended optimizations, the application can scale from its current 1
 
 ```bash
 # Memory profiling
-python -m memory_profiler src/antidetect_playwright/gui/app.py
+python -m memory_profiler src/antidetect_launcher/gui/app.py
 
 # Line profiling
-kernprof -l -v src/antidetect_playwright/gui/app.py
+kernprof -l -v src/antidetect_launcher/gui/app.py
 
 # Asyncio debugging
-PYTHONASYNCIODEBUG=1 python -m antidetect_playwright.gui.app
+PYTHONASYNCIODEBUG=1 python -m antidetect_launcher.gui.app
 
 # Qt performance
-QT_LOGGING_RULES="qt.qpa.*=true" python -m antidetect_playwright.gui.app
+QT_LOGGING_RULES="qt.qpa.*=true" python -m antidetect_launcher.gui.app
 ```
 
 ## Appendix B: Key Files Analyzed

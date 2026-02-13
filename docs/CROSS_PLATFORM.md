@@ -1,7 +1,7 @@
 # Cross-Platform Compatibility Guide
 
 This document describes the cross-platform compatibility features and best practices
-implemented in the Antidetect Browser project.
+implemented in the Antidetect Launcher project.
 
 ## Supported Platforms
 
@@ -69,7 +69,7 @@ if sys.platform == 'win32':
 
 ### Cross-Platform Permission Handling
 
-See `src/antidetect_playwright/gui/security.py:64-91` for the implemented
+See `src/antidetect_launcher/gui/security.py:64-91` for the implemented
 cross-platform permission handling in the encryption key file.
 
 ## Environment Variables
@@ -95,7 +95,7 @@ home_dir = Path.home()  # Works on Windows, Linux, macOS
 
 ### PyQt6 Configuration
 
-HiDPI support is enabled in `src/antidetect_playwright/gui/app.py:1154-1160`:
+HiDPI support is enabled in `src/antidetect_launcher/gui/app.py:1154-1160`:
 
 ```python
 from PyQt6.QtCore import Qt
@@ -122,7 +122,7 @@ This ensures crisp rendering on high-DPI displays.
 
 ### macOS Retina Support
 
-macOS Retina support is enabled in PyInstaller spec (`antidetect-browser.spec:145`):
+macOS Retina support is enabled in PyInstaller spec (`antidetect-launcher.spec:145`):
 
 ```python
 info_plist={
@@ -225,16 +225,16 @@ Test on each target platform before release:
 
 ```bash
 # Windows
-pyinstaller antidetect-browser.spec
-dist/AntidetectBrowser/AntidetectBrowser.exe
+pyinstaller antidetect-launcher.spec
+dist/AntidetectLauncher/AntidetectLauncher.exe
 
 # Linux
-pyinstaller antidetect-browser.spec
-dist/AntidetectBrowser/AntidetectBrowser
+pyinstaller antidetect-launcher.spec
+dist/AntidetectLauncher/AntidetectLauncher
 
 # macOS
-pyinstaller antidetect-browser.spec
-open dist/AntidetectBrowser.app
+pyinstaller antidetect-launcher.spec
+open dist/AntidetectLauncher.app
 ```
 
 ## Platform-Specific Fallbacks
@@ -261,9 +261,9 @@ Camoufox handles this automatically via `playwright`.
 
 Standard data directory locations:
 
-- **Windows**: `%APPDATA%/AntidetectBrowser`
-- **Linux**: `~/.local/share/antidetect-browser` or `$XDG_DATA_HOME/antidetect-browser`
-- **macOS**: `~/Library/Application Support/AntidetectBrowser`
+- **Windows**: `%APPDATA%/AntidetectLauncher`
+- **Linux**: `~/.local/share/antidetect-launcher` or `$XDG_DATA_HOME/antidetect-launcher`
+- **macOS**: `~/Library/Application Support/AntidetectLauncher`
 
 We use a simple `data/` directory in the current working directory for portability.
 

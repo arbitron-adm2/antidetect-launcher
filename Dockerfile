@@ -77,11 +77,11 @@ ENV APP_BROWSER_HEADLESS=true
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-    CMD python -c "import asyncio; from antidetect_playwright.infrastructure.redis_client import RedisClient; asyncio.run(RedisClient('localhost', 6379, None, 0, 1, 'test', 60, 5).connect())" || exit 1
+    CMD python -c "import asyncio; from antidetect_launcher.infrastructure.redis_client import RedisClient; asyncio.run(RedisClient('localhost', 6379, None, 0, 1, 'test', 60, 5).connect())" || exit 1
 
 # Volumes
 VOLUME ["/data", "/app/.config"]
 
 # Entry point
-ENTRYPOINT ["python", "-m", "antidetect_playwright"]
+ENTRYPOINT ["python", "-m", "antidetect_launcher"]
 CMD ["run"]

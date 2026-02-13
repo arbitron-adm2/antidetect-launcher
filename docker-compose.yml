@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: antidetect-playwright
+    container_name: antidetect-launcher
     restart: unless-stopped
     depends_on:
       redis:

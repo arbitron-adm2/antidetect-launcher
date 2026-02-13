@@ -1,7 +1,7 @@
 """Test coverage configuration and utilities."""
 
 [run]
-source = src/antidetect_playwright
+source = src/antidetect_launcher
 branch = True
 omit =
     */tests/*

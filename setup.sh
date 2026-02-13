@@ -3,7 +3,7 @@
 
 set -e
 
-echo "=== Antidetect Playwright Setup ==="
+echo "=== Antidetect Launcher Setup ==="
 echo
 
 # Check Python version
@@ -39,7 +39,7 @@ echo "Upgrading pip, setuptools, wheel..."
 pip install --upgrade pip setuptools wheel
 
 # Install package with GUI
-echo "Installing antidetect-playwright with GUI dependencies..."
+echo "Installing antidetect-launcher with GUI dependencies..."
 pip install -e ".[gui]"
 
 # Install Camoufox (not Playwright)
@@ -54,7 +54,7 @@ echo "=== Setup complete! ==="
 echo
 echo "To start the GUI:"
 echo "  source .venv/bin/activate"
-echo "  antidetect-browser"
+echo "  antidetect-launcher"
 echo
 echo "On first launch, Camoufox browser will be downloaded automatically."
 echo

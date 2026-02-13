@@ -26,10 +26,10 @@ compress = true
 
 [logging.modules]
 # Per-module log levels
-"antidetect_playwright" = "INFO"
-"antidetect_playwright.browser" = "INFO"
-"antidetect_playwright.stealth" = "DEBUG"
-"antidetect_playwright.proxy" = "INFO"
-"antidetect_playwright.task" = "INFO"
+"antidetect_launcher" = "INFO"
+"antidetect_launcher.browser" = "INFO"
+"antidetect_launcher.stealth" = "DEBUG"
+"antidetect_launcher.proxy" = "INFO"
+"antidetect_launcher.task" = "INFO"
 "playwright" = "WARNING"
 "asyncio" = "WARNING"

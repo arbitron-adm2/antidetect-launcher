@@ -1,4 +1,4 @@
-"""System tray icon for Antidetect Browser."""
+"""System tray icon for Antidetect Launcher."""
 
 import logging
 import sys
@@ -25,7 +25,7 @@ def find_icon(name: str) -> QIcon:
     # 1. PyInstaller bundle
     if getattr(sys, "frozen", False):
         meipass = Path(getattr(sys, "_MEIPASS", ""))
-        candidates.append(meipass / "antidetect_playwright" / "resources" / name)
+        candidates.append(meipass / "antidetect_launcher" / "resources" / name)
 
     # 2. Package resources
     resources_dir = Path(__file__).resolve().parent.parent / "resources"
@@ -69,7 +69,7 @@ class SystemTray(QObject):
         if icon.isNull():
             icon = find_icon("app-icon.svg")
         self._tray.setIcon(icon)
-        self._tray.setToolTip("Antidetect Browser")
+        self._tray.setToolTip("Antidetect Launcher")
 
         # Context menu
         self._menu = QMenu()
@@ -103,10 +103,10 @@ class SystemTray(QObject):
     def update_running_count(self, count: int) -> None:
         """Update tooltip and status with running browser count."""
         if count > 0:
-            self._tray.setToolTip(f"Antidetect Browser — {count} running")
+            self._tray.setToolTip(f"Antidetect Launcher — {count} running")
             self._status_action.setText(f"{count} browser{'s' if count != 1 else ''} running")
         else:
-            self._tray.setToolTip("Antidetect Browser")
+            self._tray.setToolTip("Antidetect Launcher")
             self._status_action.setText("No browsers running")
 
     def show_message(

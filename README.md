@@ -1,16 +1,16 @@
-# Antidetect Browser
+# Antidetect Launcher
 
 Stealth browser with anti-detection. PyQt6 GUI + Camoufox engine.
 
 ## Download
 
-**[v0.1.0](https://github.com/arbitron-adm2/antidetect-playwright/releases/tag/v0.1.0)**
+**[v0.1.0](https://github.com/arbitron-adm2/antidetect-launcher/releases/tag/v0.1.0)**
 
 | Platform | File | Size | Install |
 |----------|------|------|---------|
-| Windows | [AntidetectBrowser-Windows-x64.zip](https://github.com/arbitron-adm2/antidetect-playwright/releases/download/v0.1.0/AntidetectBrowser-Windows-x64.zip) | 93 MB | Extract → run `AntidetectBrowser.exe` |
-| Linux (deb) | [antidetect-browser_0.1.0_amd64.deb](https://github.com/arbitron-adm2/antidetect-playwright/releases/download/v0.1.0/antidetect-browser_0.1.0_amd64.deb) | 125 MB | `sudo dpkg -i antidetect-browser_0.1.0_amd64.deb` |
-| Linux (portable) | [AntidetectBrowser-Linux-x86_64.tar.gz](https://github.com/arbitron-adm2/antidetect-playwright/releases/download/v0.1.0/AntidetectBrowser-Linux-x86_64.tar.gz) | 161 MB | Extract → `./AntidetectBrowser` |
+| Windows | [AntidetectLauncher-Windows-x64.zip](https://github.com/arbitron-adm2/antidetect-launcher/releases/download/v0.1.0/AntidetectLauncher-Windows-x64.zip) | 93 MB | Extract → run `AntidetectLauncher.exe` |
+| Linux (deb) | [antidetect-launcher_0.1.0_amd64.deb](https://github.com/arbitron-adm2/antidetect-launcher/releases/download/v0.1.0/antidetect-launcher_0.1.0_amd64.deb) | 125 MB | `sudo dpkg -i antidetect-launcher_0.1.0_amd64.deb` |
+| Linux (portable) | [AntidetectLauncher-Linux-x86_64.tar.gz](https://github.com/arbitron-adm2/antidetect-launcher/releases/download/v0.1.0/AntidetectLauncher-Linux-x86_64.tar.gz) | 161 MB | Extract → `./AntidetectLauncher` |
 
 ## Features
 
@@ -24,10 +24,10 @@ Stealth browser with anti-detection. PyQt6 GUI + Camoufox engine.
 ## From source
 
 ```bash
-git clone https://github.com/arbitron-adm2/antidetect-playwright.git
-cd antidetect-playwright
+git clone https://github.com/arbitron-adm2/antidetect-launcher.git
+cd antidetect-launcher
 pip install -e ".[gui]"
-antidetect-browser
+antidetect-launcher
 ```
 
 Requires Python 3.12+.
@@ -37,9 +37,9 @@ Requires Python 3.12+.
 | Mode | Path |
 |------|------|
 | Dev (from source) | `./data/` |
-| Installed — Linux | `~/.local/share/antidetect-browser/` |
-| Installed — Windows | `%APPDATA%\AntidetectBrowser\` |
-| Installed — macOS | `~/Library/Application Support/AntidetectBrowser/` |
+| Installed — Linux | `~/.local/share/antidetect-launcher/` |
+| Installed — Windows | `%APPDATA%\AntidetectLauncher\` |
+| Installed — macOS | `~/Library/Application Support/AntidetectLauncher/` |
 
 ## License
 

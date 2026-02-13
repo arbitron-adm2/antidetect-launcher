@@ -1,7 +1,7 @@
 # Code Refactoring Summary
 
 ## Overview
-This document summarizes the code quality improvements and refactoring recommendations for the antidetect-playwright GUI codebase.
+This document summarizes the code quality improvements and refactoring recommendations for the antidetect-launcher GUI codebase.
 
 ## Current State Analysis
 
