@@ -4,6 +4,16 @@
 
 PyQt6-based GUI launcher for managing browser profiles with fingerprint spoofing (Camoufox). Dolphin Anty-style dark theme interface.
 
+## 📥 Download
+
+### Latest Release — [v0.1.0](https://github.com/arbitron-adm2/antidetect-playwright/releases/tag/v0.1.0)
+
+| Platform | File | How to install |
+|----------|------|----------------|
+| **Windows** | [`AntidetectBrowser-Windows-x64.zip`](https://github.com/arbitron-adm2/antidetect-playwright/releases/download/v0.1.0/AntidetectBrowser-Windows-x64.zip) | Extract and run `AntidetectBrowser.exe` |
+| **Linux (deb)** | [`antidetect-browser_0.1.0_amd64.deb`](https://github.com/arbitron-adm2/antidetect-playwright/releases/download/v0.1.0/antidetect-browser_0.1.0_amd64.deb) | `sudo dpkg -i antidetect-browser_0.1.0_amd64.deb` |
+| **Linux (portable)** | [`AntidetectBrowser-Linux-x86_64.tar.gz`](https://github.com/arbitron-adm2/antidetect-playwright/releases/download/v0.1.0/AntidetectBrowser-Linux-x86_64.tar.gz) | Extract and run `./AntidetectBrowser` |
+
 ## ✨ Features
 
 - 🎭 **Fingerprint Spoofing** - Canvas, WebGL, fonts, timezone, geolocation
@@ -24,7 +34,7 @@ PyQt6-based GUI launcher for managing browser profiles with fingerprint spoofing
 ### Linux / macOS
 
 ```bash
-git clone https://github.com/antidetect/antidetect-playwright.git
+git clone https://github.com/arbitron-adm2/antidetect-playwright.git
 cd antidetect-playwright
 chmod +x setup.sh
 ./setup.sh
@@ -39,7 +49,7 @@ antidetect-browser
 ### Windows
 
 ```cmd
-git clone https://github.com/antidetect/antidetect-playwright.git
+git clone https://github.com/arbitron-adm2/antidetect-playwright.git
 cd antidetect-playwright
 setup.bat
 
@@ -178,10 +188,4 @@ ruff format src/
 
 ## 📄 License
 
-MIT License - See [LICENSE](LICENSE)
-
----
-
-## 📄 License
-
-MIT License
+MIT License — See [LICENSE](LICENSE)

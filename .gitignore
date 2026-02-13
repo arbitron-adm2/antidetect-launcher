@@ -45,8 +45,9 @@ env/
 .claude/
 .docs/
 
-# GitHub workflows and configs (if not needed in repo)
-.github/
+# GitHub (keep only workflows for CI/CD)
+.github/*
+!.github/workflows/
 
 # Build scripts and artifacts
 build/
@@ -180,7 +181,7 @@ build/*.AppImage
 
 # PyInstaller
 *.manifest
-*.spec
+*.spec.bak
 
 # Installer logs
 pip-log.txt

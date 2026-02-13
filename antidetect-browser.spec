@@ -21,22 +21,13 @@ language_tags_pkg = site_packages / "language_tags"
 
 # Platform-specific icon and version info
 if sys.platform == "win32":
-    icon_file = str(icon_path / "icon.ico")
-    # Version info for Windows executable
-    version_info = (
-        "0.1.0",  # FileVersion
-        "0.1.0",  # ProductVersion
-        "Antidetect Browser",  # FileDescription
-        "Antidetect Browser",  # ProductName
-        "Antidetect Team",  # CompanyName
-        "© 2024 Antidetect Team",  # LegalCopyright
-    )
+    _ico = icon_path / "icon.ico"
+    icon_file = str(_ico) if _ico.exists() else None
 elif sys.platform == "darwin":
-    icon_file = str(icon_path / "icon.icns")
-    version_info = None
+    _icns = icon_path / "icon.icns"
+    icon_file = str(_icns) if _icns.exists() else None
 else:
     icon_file = None
-    version_info = None
 
 # Collect all resource files
 datas = [
@@ -45,10 +36,6 @@ datas = [
     (str(resources_dir / "app-icon-256.svg"), "antidetect_playwright/resources"),
     (str(resources_dir / "tray-icon.svg"), "antidetect_playwright/resources"),
     (str(resources_dir / "default_config"), "antidetect_playwright/resources/default_config"),
-    # Also place configs at top-level for easy access
-    (str(project_root / ".config" / "app.toml"), "config"),
-    (str(project_root / ".config" / "runtime.toml"), "config"),
-    (str(project_root / ".config" / "logging.toml"), "config"),
     # Browserforge data files
     (str(browserforge_data / "fingerprints/data"), "browserforge/fingerprints/data"),
     (str(browserforge_data / "headers/data"), "browserforge/headers/data"),
@@ -57,6 +44,16 @@ datas = [
     # Language tags data
     (str(language_tags_pkg / "data"), "language_tags/data"),
 ]
+
+# Add config files (from .config/ if present, else from resources/default_config)
+config_dir = project_root / ".config"
+default_config_dir = resources_dir / "default_config"
+for cfg_name in ("app.toml", "runtime.toml", "logging.toml"):
+    cfg = config_dir / cfg_name
+    if not cfg.exists():
+        cfg = default_config_dir / cfg_name
+    if cfg.exists():
+        datas.append((str(cfg), "config"))
 
 # Hidden imports (packages not auto-detected)
 hiddenimports = [
@@ -121,8 +118,8 @@ exe = EXE(
     codesign_identity=None,
     entitlements_file=None,
     icon=icon_file,
-    version='build/version_info.txt' if sys.platform == "win32" else None,
-    manifest='build/windows_manifest.xml' if sys.platform == "win32" else None,
+    version='build/version_info.txt' if sys.platform == "win32" and (project_root / 'build/version_info.txt').exists() else None,
+    manifest='build/windows_manifest.xml' if sys.platform == "win32" and (project_root / 'build/windows_manifest.xml').exists() else None,
     uac_admin=False,  # Don't require admin rights
     uac_uiaccess=False,
 )

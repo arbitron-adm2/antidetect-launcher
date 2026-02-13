@@ -1,0 +1,195 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      create_release:
+        description: 'Create GitHub release'
+        required: false
+        default: 'false'
+        type: boolean
+
+env:
+  PYTHON_VERSION: '3.12'
+
+jobs:
+  build-windows:
+    name: Build Windows Portable
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python ${{ env.PYTHON_VERSION }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip setuptools wheel
+        pip install -e ".[gui,package]"
+
+    - name: Install Playwright browsers
+      run: python -m playwright install firefox
+
+    - name: Build with PyInstaller
+      run: python -m PyInstaller antidetect-browser.spec --clean --noconfirm
+
+    - name: Create portable ZIP
+      run: |
+        Compress-Archive -Path dist\AntidetectBrowser -DestinationPath dist\AntidetectBrowser-Windows-x64.zip
+
+    - name: Calculate checksum
+      shell: pwsh
+      run: |
+        $hash = (Get-FileHash dist\AntidetectBrowser-Windows-x64.zip -Algorithm SHA256).Hash
+        "$hash  AntidetectBrowser-Windows-x64.zip" | Out-File -Encoding utf8 dist\checksums-windows.txt
+        Get-Content dist\checksums-windows.txt
+
+    - name: Upload Windows artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: windows-portable
+        path: |
+          dist/AntidetectBrowser-Windows-x64.zip
+          dist/checksums-windows.txt
+        retention-days: 30
+
+  build-linux:
+    name: Build Linux Portable
+    runs-on: ubuntu-22.04
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python ${{ env.PYTHON_VERSION }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        cache: 'pip'
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libxkbcommon0 libxcb-xinerama0 libegl1
+
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip setuptools wheel
+        pip install -e ".[gui,package]"
+
+    - name: Install Playwright browsers
+      run: python -m playwright install firefox --with-deps
+
+    - name: Build with PyInstaller
+      run: python -m PyInstaller antidetect-browser.spec --clean --noconfirm
+
+    - name: Create tarball
+      run: |
+        cd dist
+        tar czf AntidetectBrowser-Linux-x86_64.tar.gz AntidetectBrowser/
+        sha256sum AntidetectBrowser-Linux-x86_64.tar.gz > checksums-linux.txt
+        cat checksums-linux.txt
+
+    - name: Upload Linux artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: linux-portable
+        path: |
+          dist/AntidetectBrowser-Linux-x86_64.tar.gz
+          dist/checksums-linux.txt
+        retention-days: 30
+
+  release:
+    name: Create GitHub Release
+    needs: [build-windows, build-linux]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v') || github.event.inputs.create_release == 'true'
+
+    permissions:
+      contents: write
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        merge-multiple: true
+        path: artifacts
+
+    - name: List artifacts
+      run: ls -la artifacts/
+
+    - name: Get version from tag
+      id: version
+      run: |
+        if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+          echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+          echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+        else
+          echo "VERSION=dev" >> $GITHUB_OUTPUT
+          echo "TAG=dev-build" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ steps.version.outputs.TAG }}
+        name: Antidetect Browser v${{ steps.version.outputs.VERSION }}
+        draft: false
+        prerelease: false
+        generate_release_notes: true
+        files: |
+          artifacts/AntidetectBrowser-Windows-x64.zip
+          artifacts/AntidetectBrowser-Linux-x86_64.tar.gz
+          artifacts/checksums-windows.txt
+          artifacts/checksums-linux.txt
+        body: |
+          ## Antidetect Browser v${{ steps.version.outputs.VERSION }}
+
+          ### Downloads
+
+          | Platform | File | Description |
+          |----------|------|-------------|
+          | Windows  | `AntidetectBrowser-Windows-x64.zip` | Portable (extract & run) |
+          | Linux    | `AntidetectBrowser-Linux-x86_64.tar.gz` | Portable (extract & run) |
+
+          ### Installation
+
+          **Windows:**
+          1. Download `AntidetectBrowser-Windows-x64.zip`
+          2. Extract to any folder
+          3. Run `AntidetectBrowser.exe`
+
+          **Linux:**
+          ```bash
+          tar xzf AntidetectBrowser-Linux-x86_64.tar.gz
+          cd AntidetectBrowser
+          ./AntidetectBrowser
+          ```
+
+          ### Features
+          - Stealth browser automation with anti-detection (Camoufox)
+          - Modern PyQt6 dark-theme GUI
+          - Profile management with fingerprint spoofing
+          - Proxy support (HTTP/HTTPS/SOCKS5)
+          - System tray with running browser count
+          - Cross-platform autostart
+          - Platform-specific data storage
+
+          ### System Requirements
+          - **Windows:** Windows 10/11 (64-bit)
+          - **Linux:** Ubuntu 22.04+ / Debian 12+ (64-bit)
+          - 4 GB RAM (8 GB recommended)
+          - 500 MB disk space
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
