@@ -29,7 +29,7 @@ from PyQt6.QtWidgets import (
     QStackedWidget,
 )
 from PyQt6.QtCore import Qt, QSize
-from PyQt6.QtGui import QShortcut, QKeySequence, QIcon
+from PyQt6.QtGui import QShortcut, QKeySequence
 import qasync
 
 from .models import BrowserProfile, ProfileStatus
@@ -39,6 +39,7 @@ from .theme import Theme
 from .icons import get_icon
 from .security import install_secure_logging
 from .paths import get_data_dir
+from .tray import SystemTray, find_icon
 from .widgets import (
     StatusBadge,
     TagsWidget,
@@ -83,10 +84,18 @@ class MainWindow(QMainWindow):
         # Performance optimization: cache current page profile IDs for incremental updates
         self._current_page_profile_ids: list[str] = []
         self._widget_cache: dict[tuple[int, int], QWidget] = {}  # (row, col) -> widget
+        self._really_quitting = False  # True only when Quit is chosen from tray menu
 
         self._setup_ui()
         self._setup_callbacks()
         self._load_data()
+
+        # System tray (close minimizes to tray; exit only via tray Quit)
+        self._tray = SystemTray(self)
+        self._tray.show_requested.connect(self._toggle_visibility)
+        self._tray.quit_requested.connect(self._quit_app)
+        self._tray.show()
+        self._tray.update_running_count(self.launcher.get_running_count())
 
         # Apply saved window size and position
         self.resize(self.settings.window_width, self.settings.window_height)
@@ -98,10 +107,10 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Antidetect Browser")
         self.setMinimumSize(1200, 700)
 
-        # Set application icon
-        icon_path = Path(__file__).parent.parent.parent.parent / "assets" / "icons" / "app-icon.svg"
-        if icon_path.exists():
-            self.setWindowIcon(QIcon(str(icon_path)))
+        # Set application icon (works in dev, pip, and PyInstaller modes)
+        app_icon = find_icon("app-icon-256.svg")
+        if not app_icon.isNull():
+            self.setWindowIcon(app_icon)
 
         self.setStyleSheet(Theme.get_stylesheet())
 
@@ -170,7 +179,8 @@ class MainWindow(QMainWindow):
         search_shortcut = QShortcut(QKeySequence("Ctrl+F"), self)
         search_shortcut.activated.connect(
             lambda: self.profiles_page.search_input.setFocus()
-            if self.pages_stack.currentIndex() == 0 else None
+            if self.pages_stack.currentIndex() == 0
+            else None
         )
 
         # Delete: Delete selected profiles
@@ -188,9 +198,7 @@ class MainWindow(QMainWindow):
         # Ctrl+1,2,3,4: Switch between pages
         for i in range(1, 5):
             page_shortcut = QShortcut(QKeySequence(f"Ctrl+{i}"), self)
-            page_shortcut.activated.connect(
-                lambda idx=i-1: self._switch_page(idx)
-            )
+            page_shortcut.activated.connect(lambda idx=i - 1: self._switch_page(idx))
 
     def _safe_get_profile(self, profile_id: str) -> BrowserProfile | None:
         """Get profile by id without letting storage exceptions crash the UI."""
@@ -208,9 +216,7 @@ class MainWindow(QMainWindow):
         try:
             task = asyncio.create_task(coro)
         except RuntimeError as e:
-            logging.getLogger(__name__).warning(
-                "Cannot start task (%s): %s", context, e
-            )
+            logging.getLogger(__name__).warning("Cannot start task (%s): %s", context, e)
             return
 
         def _done(t: asyncio.Task) -> None:
@@ -265,9 +271,7 @@ class MainWindow(QMainWindow):
     def _connect_trash_page_signals(self):
         """Connect signals from trash page."""
         self.trash_page.restore_requested.connect(self._restore_profiles_from_trash)
-        self.trash_page.permanent_delete_requested.connect(
-            self._permanently_delete_profiles
-        )
+        self.trash_page.permanent_delete_requested.connect(self._permanently_delete_profiles)
 
     def _switch_page(self, index: int):
         """Switch to page by index."""
@@ -277,19 +281,33 @@ class MainWindow(QMainWindow):
         """Setup launcher callbacks."""
         self.launcher.set_status_callback(self._on_status_change)
         self.launcher.set_browser_closed_callback(self._on_browser_closed)
+        # Defer watchdog start until event loop is running
+        from PyQt6.QtCore import QTimer
+
+        QTimer.singleShot(0, self.launcher.start_watchdog)
 
     def _load_data(self):
-        """Load and display data."""
+        """Load and display data.
+
+        Reconciles persisted profile status with actual launcher state.
+        On fresh start, all browsers are stopped, so any profile stuck
+        in STARTING/STOPPING/RUNNING is reset to STOPPED.
+        """
         for profile in self.storage.get_profiles():
             running = self.launcher.is_running(profile.id)
             if running:
                 next_status = ProfileStatus.RUNNING
+            elif profile.status in (
+                ProfileStatus.STARTING,
+                ProfileStatus.STOPPING,
+                ProfileStatus.RUNNING,
+            ):
+                # Stale status from crash/unclean shutdown → reset
+                next_status = ProfileStatus.STOPPED
+            elif profile.status == ProfileStatus.ERROR:
+                next_status = ProfileStatus.ERROR
             else:
-                next_status = (
-                    ProfileStatus.ERROR
-                    if profile.status == ProfileStatus.ERROR
-                    else ProfileStatus.STOPPED
-                )
+                next_status = ProfileStatus.STOPPED
             if profile.status != next_status:
                 profile.status = next_status
                 self.storage.update_profile(profile)
@@ -308,9 +326,7 @@ class MainWindow(QMainWindow):
     def _refresh_folders(self):
         """Refresh folders list in sidebar."""
         folders = self.storage.get_folders()
-        folder_counts = {
-            f.id: self.storage.get_folder_profile_count(f.id) for f in folders
-        }
+        folder_counts = {f.id: self.storage.get_folder_profile_count(f.id) for f in folders}
         all_count = len(self.storage.get_profiles())
 
         self.profiles_page.update_all_profiles_count(all_count)
@@ -331,11 +347,16 @@ class MainWindow(QMainWindow):
         except ValueError:
             return
 
-        # Update status badge widget only (column 2)
+        # Update status badge (column 2)
         table = self.profiles_page.table
         existing_widget = table.indexWidget(self.profiles_page.table_model.index(row, 2))
         if existing_widget and isinstance(existing_widget, StatusBadge):
             existing_widget.update_status(new_status)
+
+        # Update start/stop button (column 1)
+        name_widget = table.indexWidget(self.profiles_page.table_model.index(row, 1))
+        if name_widget and isinstance(name_widget, ProfileNameWidget):
+            name_widget.update_status(new_status)
 
     def _refresh_table(self, force_full_rebuild: bool = False):
         """Refresh profiles table with optional incremental updates.
@@ -429,15 +450,11 @@ class MainWindow(QMainWindow):
 
         for row, profile in enumerate(page_profiles):
             # Checkbox column (index 0)
-            self.profiles_page.add_checkbox_to_row(
-                row, checked=profile.id in selected_profile_ids
-            )
+            self.profiles_page.add_checkbox_to_row(row, checked=profile.id in selected_profile_ids)
 
             # Name column with OS icon and Start/Stop (index 1)
             name_widget = ProfileNameWidget(profile)
-            name_widget.start_requested.connect(
-                lambda p=profile: self._start_profile(p)
-            )
+            name_widget.start_requested.connect(lambda p=profile: self._start_profile(p))
             name_widget.stop_requested.connect(lambda p=profile: self._stop_profile(p))
             name_widget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
             name_widget.customContextMenuRequested.connect(
@@ -544,12 +561,8 @@ class MainWindow(QMainWindow):
 
         # Update folder label
         if folder_id:
-            folder = next(
-                (f for f in self.storage.get_folders() if f.id == folder_id), None
-            )
-            self.profiles_page.set_folder_label(
-                folder.name if folder else "All Profiles"
-            )
+            folder = next((f for f in self.storage.get_folders() if f.id == folder_id), None)
+            self.profiles_page.set_folder_label(folder.name if folder else "All Profiles")
         else:
             self.profiles_page.set_folder_label("All Profiles")
 
@@ -627,9 +640,7 @@ class MainWindow(QMainWindow):
 
     def _edit_folder(self, folder_id: str):
         """Edit folder."""
-        folder = next(
-            (f for f in self.storage.get_folders() if f.id == folder_id), None
-        )
+        folder = next((f for f in self.storage.get_folders() if f.id == folder_id), None)
         if folder:
             updated = show_folder_popup(self, folder)
             if updated:
@@ -712,9 +723,7 @@ class MainWindow(QMainWindow):
         for folder in folders:
             folder_action = move_menu.addAction(folder.name)
             folder_action.triggered.connect(
-                lambda checked, fid=folder.id: self._move_profile_to_folder(
-                    profile, fid
-                )
+                lambda checked, fid=folder.id: self._move_profile_to_folder(profile, fid)
             )
             if profile.folder_id == folder.id:
                 folder_action.setEnabled(False)
@@ -744,9 +753,7 @@ class MainWindow(QMainWindow):
                 fingerprint_file = data_dir / updated_profile.id / "fingerprint.json"
                 if fingerprint_file.exists():
                     fingerprint_file.unlink()
-                    logger.info(
-                        f"Deleted fingerprint for regeneration: {fingerprint_file}"
-                    )
+                    logger.info(f"Deleted fingerprint for regeneration: {fingerprint_file}")
 
             self.storage.update_profile(updated_profile)
             self._refresh_table()
@@ -820,6 +827,11 @@ class MainWindow(QMainWindow):
             self._refresh_table()
             return
 
+        # Set STOPPING status immediately for visual feedback
+        profile.status = ProfileStatus.STOPPING
+        self.storage.update_profile(profile)
+        self._refresh_table()
+
         success = await self.launcher.stop_profile(profile.id)
         if not success:
             profile.status = ProfileStatus.ERROR
@@ -834,6 +846,8 @@ class MainWindow(QMainWindow):
             self.storage.update_profile(profile)
         # Use incremental update instead of full rebuild (8x faster)
         self._update_profile_status_incremental(profile_id, status)
+        # Update tray tooltip with running browser count
+        self._tray.update_running_count(self.launcher.get_running_count())
 
     def _on_browser_closed(self, profile_id: str):
         """Handle browser manually closed."""
@@ -842,6 +856,7 @@ class MainWindow(QMainWindow):
             profile.status = ProfileStatus.STOPPED
             self.storage.update_profile(profile)
         self._refresh_table()
+        self._tray.update_running_count(self.launcher.get_running_count())
 
     def _edit_notes(self, profile: BrowserProfile):
         """Edit profile notes."""
@@ -967,30 +982,32 @@ class MainWindow(QMainWindow):
 
     def _batch_start_profiles(self, profile_ids: list[str]):
         """Start multiple profiles in parallel with limit."""
+
         async def start_all():
             """Start all profiles concurrently with concurrency limit."""
             # Limit concurrent starts to avoid system overload
             semaphore = asyncio.Semaphore(5)  # Max 5 simultaneous starts
-            
+
             async def start_one(profile):
                 async with semaphore:
                     await self._start_profile(profile)
-            
+
             tasks = []
             for pid in profile_ids:
                 profile = self._safe_get_profile(pid)
                 if profile is not None:
                     tasks.append(start_one(profile))
-            
+
             if tasks:
                 # Wait for all profiles to start (or fail) concurrently
                 await asyncio.gather(*tasks, return_exceptions=True)
-        
+
         # Spawn the batch start as a background task
         self._spawn_task(start_all(), context="batch_start_profiles")
 
     def _batch_stop_profiles(self, profile_ids: list[str]):
         """Stop multiple profiles in parallel."""
+
         async def stop_all():
             """Stop all profiles concurrently."""
             tasks = []
@@ -998,10 +1015,10 @@ class MainWindow(QMainWindow):
                 profile = self._safe_get_profile(pid)
                 if profile is not None:
                     tasks.append(self._stop_profile(profile))
-            
+
             if tasks:
                 await asyncio.gather(*tasks, return_exceptions=True)
-        
+
         self._spawn_task(stop_all(), context="batch_stop_profiles")
 
     def _batch_tag_profiles(self, profile_ids: list[str]):
@@ -1009,9 +1026,7 @@ class MainWindow(QMainWindow):
         if not profile_ids:
             return
         # Use first profile for dialog, apply to all
-        profiles = [
-            p for pid in profile_ids if (p := self._safe_get_profile(pid)) is not None
-        ]
+        profiles = [p for pid in profile_ids if (p := self._safe_get_profile(pid)) is not None]
         if not profiles:
             return
 
@@ -1027,9 +1042,7 @@ class MainWindow(QMainWindow):
         """Set notes for multiple profiles."""
         if not profile_ids:
             return
-        profiles = [
-            p for pid in profile_ids if (p := self._safe_get_profile(pid)) is not None
-        ]
+        profiles = [p for pid in profile_ids if (p := self._safe_get_profile(pid)) is not None]
         if not profiles:
             return
 
@@ -1046,6 +1059,7 @@ class MainWindow(QMainWindow):
 
     def _batch_ping_profiles(self, profile_ids: list[str]):
         """Ping proxies for multiple profiles in parallel."""
+
         async def ping_all():
             """Ping all profile proxies concurrently."""
             tasks = []
@@ -1053,7 +1067,7 @@ class MainWindow(QMainWindow):
                 profile = self._safe_get_profile(pid)
                 if profile is not None and profile.proxy.enabled:
                     tasks.append(self._ping_proxy(profile))
-            
+
             if tasks:
                 await asyncio.gather(*tasks, return_exceptions=True)
 
@@ -1065,8 +1079,7 @@ class MainWindow(QMainWindow):
             selected = self.profiles_page.get_selected_profile_ids()
             if selected:
                 self._spawn_task(
-                    self._batch_delete_profiles(selected),
-                    context="delete_selected_shortcut"
+                    self._batch_delete_profiles(selected), context="delete_selected_shortcut"
                 )
 
     def _select_all_profiles_shortcut(self):
@@ -1261,19 +1274,52 @@ class MainWindow(QMainWindow):
     def resizeEvent(self, event):
         """Handle window resize with auto-collapse sidebar."""
         super().resizeEvent(event)
-        
+
         # Auto-collapse sidebar when window width is less than 1400px
         # Auto-expand when window width is more than 1500px (with hysteresis)
         width = event.size().width()
-        
+
         if width < 1400 and not self.mini_sidebar._collapsed:
             self.mini_sidebar.set_collapsed(True)
         elif width > 1500 and self.mini_sidebar._collapsed:
             self.mini_sidebar.set_collapsed(False)
 
+    def _toggle_visibility(self):
+        """Toggle window visibility (called from tray icon)."""
+        if self.isVisible():
+            self.hide()
+        else:
+            self.show()
+            self.raise_()
+            self.activateWindow()
+
+    def _quit_app(self):
+        """Actually quit the application (called from tray Quit action).
+
+        Sets the _really_quitting flag so closeEvent performs full cleanup
+        instead of minimizing to tray.
+        """
+        self._really_quitting = True
+        self.close()
+
     def closeEvent(self, event):
-        """Handle window close with graceful browser shutdown."""
-        # Save window size and position
+        """Handle window close.
+
+        Default behaviour: minimize to system tray (X button / Alt+F4).
+        Full shutdown only when _really_quitting is True (tray → Quit).
+        """
+        if not self._really_quitting:
+            # Minimize to tray instead of closing
+            event.ignore()
+            self.hide()
+            self._tray.show_message(
+                "Antidetect Browser",
+                "Application minimized to tray. Right-click tray icon → Quit to exit.",
+            )
+            return
+
+        # --- Full shutdown path ---
+        # Save window geometry
         self.settings.window_width = self.width()
         self.settings.window_height = self.height()
         self.settings.window_x = self.x()
@@ -1281,11 +1327,27 @@ class MainWindow(QMainWindow):
         self.storage.update_settings(self.settings)
 
         # Graceful shutdown all running browsers
-        loop = asyncio.get_event_loop()
-        if loop.is_running():
-            # Best-effort: don't block close for too long.
-            self._spawn_task(self.launcher.cleanup(), context="launcher.cleanup")
+        running_count = self.launcher.get_running_count()
+        if running_count > 0:
+            logger.info("Closing %d running browsers before exit...", running_count)
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                # Schedule cleanup and wait for it with timeout
+                cleanup_future = asyncio.ensure_future(self.launcher.cleanup())
 
+                # Process events until cleanup is done (max 15s)
+                from PyQt6.QtCore import QTimer, QEventLoop
+
+                wait_loop = QEventLoop()
+                cleanup_future.add_done_callback(lambda _: wait_loop.quit())
+                QTimer.singleShot(15000, wait_loop.quit)  # Safety timeout
+                wait_loop.exec()
+        else:
+            # Stop watchdog even if no browsers running
+            self.launcher.stop_watchdog()
+
+        # Hide tray icon before exit
+        self._tray.hide()
         event.accept()
 
 
@@ -1295,8 +1357,9 @@ def main():
     install_secure_logging()
 
     from antidetect_playwright.config import load_config
+    from antidetect_playwright.gui.paths import ensure_config_files
 
-    config_dir = os.environ.get("APP_CONFIG_DIR") or ".config"
+    config_dir = os.environ.get("APP_CONFIG_DIR") or str(ensure_config_files())
     config = load_config(config_dir)
 
     # Enable HiDPI support before creating QApplication
@@ -1313,10 +1376,12 @@ def main():
     app.setStyle("Fusion")
     app.setProperty("inline_alert_ttl_ms", config.gui.inline_alert_ttl_ms)
 
-    # Set application icon
-    icon_path = Path(__file__).parent.parent.parent / "assets" / "icons" / "app-icon.svg"
-    if icon_path.exists():
-        app.setWindowIcon(QIcon(str(icon_path)))
+    # Set application icon (works in dev, pip, and PyInstaller modes)
+    from .tray import find_icon as _find_app_icon
+
+    app_icon = _find_app_icon("app-icon-256.svg")
+    if not app_icon.isNull():
+        app.setWindowIcon(app_icon)
 
     # Setup async event loop with qasync
     loop = qasync.QEventLoop(app)

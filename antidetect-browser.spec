@@ -42,6 +42,13 @@ else:
 datas = [
     (str(resources_dir / "chrome"), "antidetect_playwright/resources/chrome"),
     (str(resources_dir / "icon.svg"), "antidetect_playwright/resources"),
+    (str(resources_dir / "app-icon-256.svg"), "antidetect_playwright/resources"),
+    (str(resources_dir / "tray-icon.svg"), "antidetect_playwright/resources"),
+    (str(resources_dir / "default_config"), "antidetect_playwright/resources/default_config"),
+    # Also place configs at top-level for easy access
+    (str(project_root / ".config" / "app.toml"), "config"),
+    (str(project_root / ".config" / "runtime.toml"), "config"),
+    (str(project_root / ".config" / "logging.toml"), "config"),
     # Browserforge data files
     (str(browserforge_data / "fingerprints/data"), "browserforge/fingerprints/data"),
     (str(browserforge_data / "headers/data"), "browserforge/headers/data"),

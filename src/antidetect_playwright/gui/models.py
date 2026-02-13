@@ -13,6 +13,7 @@ class ProfileStatus(Enum):
     STOPPED = "stopped"
     STARTING = "starting"
     RUNNING = "running"
+    STOPPING = "stopping"
     ERROR = "error"
 
 
@@ -122,9 +123,7 @@ class ProxyConfig:
                 # If decryption fails, assume it's plaintext (migration)
                 import logging
 
-                logging.getLogger(__name__).warning(
-                    f"Failed to decrypt password, using as-is: {e}"
-                )
+                logging.getLogger(__name__).warning(f"Failed to decrypt password, using as-is: {e}")
 
         return cls(
             enabled=data.get("enabled", False),
@@ -194,7 +193,7 @@ class BrowserProfile:
         proxy = ProxyConfig.from_dict(proxy_data, decrypt_password=True)
 
         status_value = data.get("status", "stopped")
-        if status_value == "stopping":
+        if status_value in ("stopping", "starting"):
             status_value = "stopped"
 
         return cls(
@@ -211,9 +210,7 @@ class BrowserProfile:
                 else datetime.now()
             ),
             last_used=(
-                datetime.fromisoformat(data["last_used"])
-                if data.get("last_used")
-                else None
+                datetime.fromisoformat(data["last_used"]) if data.get("last_used") else None
             ),
             os_type=data.get("os_type", "macos"),
         )

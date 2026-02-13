@@ -38,8 +38,8 @@ class EmptyPlaceholder(QWidget):
         icon_btn.setStyleSheet(
             f"""
             QPushButton {{
-                background-color: {COLORS['bg_tertiary']};
-                border: 2px solid {COLORS['border']};
+                background-color: {COLORS["bg_tertiary"]};
+                border: 2px solid {COLORS["border"]};
                 border-radius: 36px;
             }}
         """
@@ -57,7 +57,7 @@ class EmptyPlaceholder(QWidget):
         title = QLabel("No profiles yet")
         title.setStyleSheet(
             f"""
-            color: {COLORS['text_primary']};
+            color: {COLORS["text_primary"]};
             font-size: 18px;
             font-weight: 600;
         """
@@ -80,7 +80,7 @@ class EmptyPlaceholder(QWidget):
         create_btn.setStyleSheet(
             f"""
             QPushButton {{
-                background-color: {COLORS['accent']};
+                background-color: {COLORS["accent"]};
                 color: white;
                 border: none;
                 border-radius: 4px;
@@ -89,7 +89,7 @@ class EmptyPlaceholder(QWidget):
                 font-weight: 600;
             }}
             QPushButton:hover {{
-                background-color: {COLORS['accent_hover']};
+                background-color: {COLORS["accent_hover"]};
             }}
         """
         )
@@ -137,6 +137,11 @@ class StatusBadge(QWidget):
                     "border": COLORS["info"],
                     "text": COLORS["info"],
                 },
+                ProfileStatus.STOPPING: {
+                    "bg": "rgba(251, 146, 60, 0.15)",
+                    "border": COLORS["warning"],
+                    "text": COLORS["warning"],
+                },
                 ProfileStatus.STOPPED: {
                     "bg": "rgba(209, 213, 219, 0.12)",
                     "border": COLORS["text_secondary"],
@@ -159,9 +164,9 @@ class StatusBadge(QWidget):
             self._label.setText(text)
             self._label.setStyleSheet(
                 f"""
-                background-color: {style['bg']};
-                color: {style['text']};
-                border: 1px solid {style['border']};
+                background-color: {style["bg"]};
+                color: {style["text"]};
+                border: 1px solid {style["border"]};
                 border-radius: 4px;
                 padding: 0 10px;
                 font-size: 10px;
@@ -190,10 +195,15 @@ class StatusBadge(QWidget):
                 "border": COLORS["info"],
                 "text": COLORS["info"],
             },
+            ProfileStatus.STOPPING: {
+                "bg": "rgba(251, 146, 60, 0.15)",
+                "border": COLORS["warning"],
+                "text": COLORS["warning"],
+            },
             ProfileStatus.STOPPED: {
                 "bg": "rgba(209, 213, 219, 0.12)",  # Improved contrast
                 "border": COLORS["text_secondary"],  # Using improved #d1d5db
-                "text": COLORS["text_secondary"],    # WCAG AA compliant
+                "text": COLORS["text_secondary"],  # WCAG AA compliant
             },
             ProfileStatus.ERROR: {
                 "bg": "rgba(239, 68, 68, 0.15)",
@@ -216,9 +226,9 @@ class StatusBadge(QWidget):
         label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         label.setStyleSheet(
             f"""
-            background-color: {style['bg']};
-            color: {style['text']};
-            border: 1px solid {style['border']};
+            background-color: {style["bg"]};
+            color: {style["text"]};
+            border: 1px solid {style["border"]};
             border-radius: 4px;
             padding: 0 10px;
             font-size: 10px;
@@ -244,7 +254,6 @@ class TagWidget(QWidget):
         layout.setSpacing(4)
         layout.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
 
-
         label = QLabel(tag)
         label.setMinimumHeight(20)
         label.setMaximumHeight(20)
@@ -252,7 +261,7 @@ class TagWidget(QWidget):
             f"""
             background-color: transparent;
             color: white;
-            border: 1px solid {COLORS['tag_bg']};
+            border: 1px solid {COLORS["tag_bg"]};
             border-radius: 4px;
             padding: 0 8px;
             font-size: 11px;
@@ -463,7 +472,7 @@ class ProfileNameWidget(QWidget):
         name_label = QLabel(self.profile.name)
         name_label.setStyleSheet(
             f"""
-            color: {COLORS['text_primary']};
+            color: {COLORS["text_primary"]};
             font-size: 13px;
             font-weight: 500;
         """
@@ -473,10 +482,31 @@ class ProfileNameWidget(QWidget):
         layout.addStretch()
 
         # Start/Stop button with icon
-        btn = QPushButton()
-        btn.setFixedSize(72, 24)
+        self._action_btn = QPushButton()
+        self._action_btn.setFixedSize(72, 24)
+        self._action_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self._action_btn.clicked.connect(self._on_action_clicked)
+        self._apply_button_state(self.profile.status)
+        layout.addWidget(self._action_btn)
+        layout.addSpacing(6)
 
+    def _on_action_clicked(self):
+        """Dispatch click based on current profile status."""
         if self.profile.status == ProfileStatus.RUNNING:
+            self.stop_requested.emit()
+        elif self.profile.status in (ProfileStatus.STOPPED, ProfileStatus.ERROR):
+            self.start_requested.emit()
+
+    def update_status(self, new_status: ProfileStatus):
+        """Update the button to reflect a new profile status (called incrementally)."""
+        self.profile.status = new_status
+        self._apply_button_state(new_status)
+
+    def _apply_button_state(self, status: ProfileStatus):
+        """Configure button appearance for the given status."""
+        btn = self._action_btn
+
+        if status == ProfileStatus.RUNNING:
             btn.setIcon(get_icon("stop", 14))
             btn.setIconSize(QSize(14, 14))
             btn.setText("STOP")
@@ -484,8 +514,8 @@ class ProfileNameWidget(QWidget):
                 f"""
                 QPushButton {{
                     background-color: rgba(239, 68, 68, 0.1);
-                    color: {COLORS['error']};
-                    border: 1px solid {COLORS['error']};
+                    color: {COLORS["error"]};
+                    border: 1px solid {COLORS["error"]};
                     border-radius: 4px;
                     padding: 0 10px 0 6px;
                     font-size: 10px;
@@ -496,14 +526,34 @@ class ProfileNameWidget(QWidget):
                     background-color: rgba(239, 68, 68, 0.25);
                 }}
                 QPushButton:pressed {{
-                    background-color: {COLORS['error']};
+                    background-color: {COLORS["error"]};
                     color: white;
                 }}
             """
             )
             btn.setToolTip("Stop browser")
-            btn.clicked.connect(self.stop_requested.emit)
-        elif self.profile.status == ProfileStatus.STARTING:
+            btn.setEnabled(True)
+        elif status == ProfileStatus.STOPPING:
+            btn.setIcon(get_icon("refresh", 14))
+            btn.setIconSize(QSize(14, 14))
+            btn.setText("...")
+            btn.setStyleSheet(
+                f"""
+                QPushButton {{
+                    background-color: rgba(251, 146, 60, 0.1);
+                    color: {COLORS["warning"]};
+                    border: 1px solid {COLORS["warning"]};
+                    border-radius: 4px;
+                    padding: 0 10px 0 6px;
+                    font-size: 10px;
+                    font-weight: 700;
+                    letter-spacing: 0.5px;
+                }}
+            """
+            )
+            btn.setToolTip("Stopping...")
+            btn.setEnabled(False)
+        elif status == ProfileStatus.STARTING:
             btn.setIcon(get_icon("refresh", 14))
             btn.setIconSize(QSize(14, 14))
             btn.setText("...")
@@ -511,8 +561,8 @@ class ProfileNameWidget(QWidget):
                 f"""
                 QPushButton {{
                     background-color: rgba(96, 165, 250, 0.1);
-                    color: {COLORS['info']};
-                    border: 1px solid {COLORS['info']};
+                    color: {COLORS["info"]};
+                    border: 1px solid {COLORS["info"]};
                     border-radius: 4px;
                     padding: 0 10px 0 6px;
                     font-size: 10px;
@@ -531,8 +581,8 @@ class ProfileNameWidget(QWidget):
                 f"""
                 QPushButton {{
                     background-color: rgba(34, 197, 94, 0.1);
-                    color: {COLORS['success']};
-                    border: 1px solid {COLORS['success']};
+                    color: {COLORS["success"]};
+                    border: 1px solid {COLORS["success"]};
                     border-radius: 4px;
                     padding: 0 10px 0 6px;
                     font-size: 10px;
@@ -543,17 +593,13 @@ class ProfileNameWidget(QWidget):
                     background-color: rgba(34, 197, 94, 0.25);
                 }}
                 QPushButton:pressed {{
-                    background-color: {COLORS['success']};
+                    background-color: {COLORS["success"]};
                     color: white;
                 }}
             """
             )
             btn.setToolTip("Start browser")
-            btn.clicked.connect(self.start_requested.emit)
-
-        btn.setCursor(Qt.CursorShape.PointingHandCursor)
-        layout.addWidget(btn)
-        layout.addSpacing(6)
+            btn.setEnabled(True)
 
 
 class FolderItem(QFrame):
@@ -574,9 +620,7 @@ class FolderItem(QFrame):
         # Use theme colors consistently for selected state
         bg = COLORS["bg_selected"] if self.selected else "transparent"
         border = (
-            f"1px solid {COLORS['accent']}"
-            if self.selected
-            else f"1px solid {self.folder.color}"
+            f"1px solid {COLORS['accent']}" if self.selected else f"1px solid {self.folder.color}"
         )
         hover_bg = COLORS["bg_hover"]
         hover_border = COLORS["accent"] if self.selected else self.folder.color
@@ -628,9 +672,7 @@ class FolderItem(QFrame):
         if event.button() == Qt.MouseButton.LeftButton:
             self.clicked.emit(self.folder.id)
         elif event.button() == Qt.MouseButton.RightButton:
-            self.context_menu_requested.emit(
-                self.folder.id, event.globalPosition().toPoint()
-            )
+            self.context_menu_requested.emit(self.folder.id, event.globalPosition().toPoint())
 
 
 class AllProfilesItem(QFrame):
@@ -648,11 +690,7 @@ class AllProfilesItem(QFrame):
 
     def _setup_ui(self):
         bg = "rgba(128, 128, 128, 0.15)" if self.selected else "transparent"
-        border = (
-            f"1px solid {COLORS['accent']}"
-            if self.selected
-            else "1px solid transparent"
-        )
+        border = f"1px solid {COLORS['accent']}" if self.selected else "1px solid transparent"
         self.setStyleSheet(
             f"""
             QFrame {{
@@ -662,8 +700,8 @@ class AllProfilesItem(QFrame):
                 margin: 2px 8px;
             }}
             QFrame:hover {{
-                background-color: {COLORS['bg_hover'] if not self.selected else 'rgba(128, 128, 128, 0.15)'};
-                border: 1px solid {COLORS['text_muted']};
+                background-color: {COLORS["bg_hover"] if not self.selected else "rgba(128, 128, 128, 0.15)"};
+                border: 1px solid {COLORS["text_muted"]};
             }}
         """
         )
@@ -697,11 +735,7 @@ class AllProfilesItem(QFrame):
         """Update selected state."""
         self.selected = selected
         bg = "rgba(128, 128, 128, 0.15)" if self.selected else "transparent"
-        border = (
-            f"1px solid {COLORS['accent']}"
-            if self.selected
-            else "1px solid transparent"
-        )
+        border = f"1px solid {COLORS['accent']}" if self.selected else "1px solid transparent"
         self.setStyleSheet(
             f"""
             QFrame {{
@@ -711,8 +745,8 @@ class AllProfilesItem(QFrame):
                 margin: 2px 8px;
             }}
             QFrame:hover {{
-                background-color: {COLORS['bg_hover'] if not self.selected else 'rgba(128, 128, 128, 0.15)'};
-                border: 1px solid {COLORS['text_muted']};
+                background-color: {COLORS["bg_hover"] if not self.selected else "rgba(128, 128, 128, 0.15)"};
+                border: 1px solid {COLORS["text_muted"]};
             }}
         """
         )
@@ -784,7 +818,7 @@ class TagFilterWidget(QWidget):
     def _get_button_style(self, selected: bool) -> str:
         if selected:
             return f"""
-                background-color: {COLORS['accent']};
+                background-color: {COLORS["accent"]};
                 color: white;
                 border: none;
                 border-radius: 4px;
@@ -792,9 +826,9 @@ class TagFilterWidget(QWidget):
                 font-size: 12px;
             """
         return f"""
-            background-color: {COLORS['bg_tertiary']};
-            color: {COLORS['text_secondary']};
-            border: 1px solid {COLORS['border']};
+            background-color: {COLORS["bg_tertiary"]};
+            color: {COLORS["text_secondary"]};
+            border: 1px solid {COLORS["border"]};
             border-radius: 4px;
             padding: 5px 12px;
             font-size: 12px;
@@ -825,9 +859,7 @@ class PaginationWidget(QWidget):
 
         # Items per page label
         per_page_label = QLabel("Per page:")
-        per_page_label.setStyleSheet(
-            f"color: {COLORS['text_secondary']}; font-size: 12px;"
-        )
+        per_page_label.setStyleSheet(f"color: {COLORS['text_secondary']}; font-size: 12px;")
         layout.addWidget(per_page_label)
 
         # Items per page combo
@@ -849,9 +881,7 @@ class PaginationWidget(QWidget):
         end = min(self.page * self.per_page, self.total)
 
         self.info_label = QLabel(f"{start}-{end} of {self.total}")
-        self.info_label.setStyleSheet(
-            f"color: {COLORS['text_secondary']}; font-size: 12px;"
-        )
+        self.info_label.setStyleSheet(f"color: {COLORS['text_secondary']}; font-size: 12px;")
         layout.addWidget(self.info_label)
 
         # Spacer
@@ -865,12 +895,12 @@ class PaginationWidget(QWidget):
         self.prev_btn.setStyleSheet(
             f"""
             QPushButton {{
-                background: {COLORS['bg_tertiary']};
+                background: {COLORS["bg_tertiary"]};
                 border: none;
                 border-radius: 4px;
             }}
             QPushButton:hover {{
-                background: {COLORS['border']};
+                background: {COLORS["border"]};
             }}
             QPushButton:disabled {{
                 background: transparent;
@@ -883,9 +913,7 @@ class PaginationWidget(QWidget):
 
         # Page indicator
         self.page_label = QLabel(f"{self.page}/{total_pages}")
-        self.page_label.setStyleSheet(
-            f"color: {COLORS['text_primary']}; font-size: 12px;"
-        )
+        self.page_label.setStyleSheet(f"color: {COLORS['text_primary']}; font-size: 12px;")
         self.page_label.setMinimumWidth(45)
         self.page_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.page_label)
@@ -898,12 +926,12 @@ class PaginationWidget(QWidget):
         self.next_btn.setStyleSheet(
             f"""
             QPushButton {{
-                background: {COLORS['bg_tertiary']};
+                background: {COLORS["bg_tertiary"]};
                 border: none;
                 border-radius: 4px;
             }}
             QPushButton:hover {{
-                background: {COLORS['border']};
+                background: {COLORS["border"]};
             }}
             QPushButton:disabled {{
                 background: transparent;

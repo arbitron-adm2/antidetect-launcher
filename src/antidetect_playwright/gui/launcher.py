@@ -52,6 +52,7 @@ async def _write_json_async(file_path: Path, data: dict) -> None:
 
     await loop.run_in_executor(None, _write)
 
+
 # Screen/window dimension keys that should NOT be persisted or spoofed
 # These values are spoofed by Camoufox via JavaScript API overrides
 # If we set them, window/screen dimensions return constants
@@ -144,16 +145,83 @@ class BrowserLauncher:
         self._stopping: set[str] = set()
         self._on_status_change: Callable[[str, ProfileStatus], None] | None = None
         self._on_browser_closed: Callable[[str], None] | None = None
+        # Watchdog for periodic health checks
+        self._watchdog_task: asyncio.Task | None = None
+        self._watchdog_interval: float = 5.0  # seconds
 
-    def set_status_callback(
-        self, callback: Callable[[str, ProfileStatus], None]
-    ) -> None:
+    def set_status_callback(self, callback: Callable[[str, ProfileStatus], None]) -> None:
         """Set callback for status changes."""
         self._on_status_change = callback
 
     def set_browser_closed_callback(self, callback: Callable[[str], None]) -> None:
         """Set callback for when browser is manually closed."""
         self._on_browser_closed = callback
+
+    def start_watchdog(self) -> None:
+        """Start periodic health check watchdog.
+
+        Detects orphaned browser references where Playwright lost connection
+        but the 'close' event never fired.
+        """
+        if self._watchdog_task is not None:
+            return
+        self._watchdog_task = asyncio.create_task(self._watchdog_loop())
+        logger.debug("Browser watchdog started (interval=%ss)", self._watchdog_interval)
+
+    def stop_watchdog(self) -> None:
+        """Stop the watchdog task."""
+        if self._watchdog_task is not None:
+            self._watchdog_task.cancel()
+            self._watchdog_task = None
+            logger.debug("Browser watchdog stopped")
+
+    async def _watchdog_loop(self) -> None:
+        """Periodic health check for running browsers.
+
+        Detects browsers where the Playwright context is disconnected
+        but the monitor task failed to clean up.
+        """
+        while True:
+            try:
+                await asyncio.sleep(self._watchdog_interval)
+                await self._check_browser_health()
+            except asyncio.CancelledError:
+                return
+            except Exception as e:
+                logger.warning("Watchdog error: %s", e)
+
+    async def _check_browser_health(self) -> None:
+        """Check health of all tracked browser instances.
+
+        Cleans up any browser references where the context
+        has been disconnected without a proper close event.
+        """
+        stale_profiles: list[str] = []
+
+        for profile_id, context in list(self._browser_instances.items()):
+            if profile_id in self._stopping:
+                continue
+            try:
+                # Check if the browser context is still connected
+                # Accessing .pages on a dead context raises
+                _ = context.pages
+            except Exception:
+                logger.warning(
+                    "Browser context disconnected for profile %s, cleaning up",
+                    profile_id,
+                )
+                stale_profiles.append(profile_id)
+
+        for profile_id in stale_profiles:
+            # Cancel monitor task if still running
+            task = self._monitor_tasks.pop(profile_id, None)
+            if task is not None:
+                task.cancel()
+            await self._cleanup_profile(profile_id)
+            if self._on_status_change:
+                self._on_status_change(profile_id, ProfileStatus.STOPPED)
+            if self._on_browser_closed:
+                self._on_browser_closed(profile_id)
 
     async def launch_profile(self, profile: BrowserProfile) -> bool:
         """Launch browser for profile with auto-configured fingerprint.
@@ -178,10 +246,10 @@ class BrowserLauncher:
             user_data_dir.mkdir(parents=True, exist_ok=True)
 
             proxy = profile.proxy.to_camoufox()
-            
+
             # Debug: log proxy config (hide password)
             if proxy:
-                debug_proxy = {k: (v if k != 'password' else '***') for k, v in proxy.items()}
+                debug_proxy = {k: (v if k != "password" else "***") for k, v in proxy.items()}
                 logger.debug(f"Proxy config: {debug_proxy}")
 
             # Detect current IP for timezone and geolocation
@@ -195,9 +263,10 @@ class BrowserLauncher:
 
                 # Run blocking IP/geo detection in thread pool to avoid blocking event loop
                 loop = asyncio.get_event_loop()
-                
+
                 async def detect_ip_and_geo():
                     """Detect IP and geolocation in thread pool."""
+
                     def _sync_detect():
                         # Get public IP (through proxy if configured)
                         if proxy:
@@ -205,13 +274,13 @@ class BrowserLauncher:
                             ip = public_ip(proxy_str)
                         else:
                             ip = public_ip()
-                        
+
                         # Get geolocation from MaxMind database
                         geolocation = get_geolocation(ip)
                         return ip, geolocation
-                    
+
                     return await loop.run_in_executor(None, _sync_detect)
-                
+
                 ip, geolocation = await detect_ip_and_geo()
 
                 # Create geoip_info compatible object
@@ -265,9 +334,7 @@ class BrowserLauncher:
                 # Disable fixed viewport so browser content scales with window
                 "no_viewport": True,
                 # Performance settings
-                "block_images": (
-                    self._settings.block_images if self._settings else False
-                ),
+                "block_images": (self._settings.block_images if self._settings else False),
                 "enable_cache": self._settings.enable_cache if self._settings else True,
                 # Debug mode
                 "debug": self._settings.debug_mode if self._settings else False,
@@ -281,10 +348,7 @@ class BrowserLauncher:
                             "browser.sessionstore.resume_from_crash": True,
                             "browser.sessionstore.max_resumed_crashes": 3,
                         }
-                        if (
-                            self._settings
-                            and getattr(self._settings, "save_tabs", True)
-                        )
+                        if (self._settings and getattr(self._settings, "save_tabs", True))
                         else {
                             "browser.startup.page": 0,  # 0 = blank page
                             "browser.sessionstore.max_resumed_crashes": 0,
@@ -586,9 +650,7 @@ class BrowserLauncher:
                 }
                 # Async write to prevent UI freeze (50-200ms blocking → non-blocking)
                 await _write_json_async(fingerprint_file, fp_data)
-                logger.info(
-                    f"Generated and saved new fingerprint config to {fingerprint_file}"
-                )
+                logger.info(f"Generated and saved new fingerprint config to {fingerprint_file}")
 
             # Create launch options manually to remove screen/window keys
             # This is needed because Camoufox generates these inside launch_options()
@@ -605,9 +667,7 @@ class BrowserLauncher:
             )
 
             # Remove screen/window keys from CAMOU_CONFIG env vars for dynamic window sizing
-            from_options["env"] = _remove_screen_window_keys_from_env(
-                from_options["env"]
-            )
+            from_options["env"] = _remove_screen_window_keys_from_env(from_options["env"])
 
             # Add no_viewport for Playwright - let content scale with window
             from_options["no_viewport"] = True
@@ -633,14 +693,10 @@ class BrowserLauncher:
                 start_page = self._settings.start_page or "about:blank"
                 if start_page != "about:blank":
                     # Add https:// if no protocol specified
-                    if not start_page.startswith(
-                        ("http://", "https://", "about:", "file://")
-                    ):
+                    if not start_page.startswith(("http://", "https://", "about:", "file://")):
                         start_page = "https://" + start_page
                     try:
-                        await page.goto(
-                            start_page, wait_until="domcontentloaded", timeout=10000
-                        )
+                        await page.goto(start_page, wait_until="domcontentloaded", timeout=10000)
                     except Exception as e:
                         logger.warning(f"Failed to load start page {start_page}: {e}")
 
@@ -662,20 +718,27 @@ class BrowserLauncher:
             return False
 
     async def _monitor_browser(self, profile_id: str, context: BrowserContext) -> None:
-        """Monitor browser for manual close."""
+        """Monitor browser for manual close or crash.
+
+        Waits for the Playwright BrowserContext 'close' event.
+        Handles three scenarios:
+        1. CancelledError → programmatic stop (stop_profile called), no cleanup here
+        2. 'close' event → user closed the browser window, run cleanup
+        3. Exception → Playwright transport error / crash, run cleanup
+        """
         cancelled = False
         try:
             # Wait for context to close (user closed window)
             await context.wait_for_event("close", timeout=0)
         except asyncio.CancelledError:
             cancelled = True
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning("Browser monitor error for profile %s: %s", profile_id, e)
         finally:
             if cancelled:
                 return
-            # Browser was closed manually
-            logger.info(f"Browser closed for profile {profile_id}")
+            # Browser was closed manually or crashed
+            logger.info("Browser closed for profile %s", profile_id)
             await self._cleanup_profile(profile_id)
             if self._on_status_change:
                 self._on_status_change(profile_id, ProfileStatus.STOPPED)
@@ -683,47 +746,8 @@ class BrowserLauncher:
                 self._on_browser_closed(profile_id)
             self._stopping.discard(profile_id)
 
-    async def _save_browser_state(
-        self, profile_id: str, context: BrowserContext
-    ) -> None:
-        """Save browser state (open tabs URLs) before closing."""
-        try:
-            # Save state file
-            user_data_dir = self._data_dir / profile_id
-            state_file = user_data_dir / "browser_state.json"
-
-            # Try to get cookies (may fail if context is closing)
-            cookies = []
-            try:
-                cookies = await context.cookies()
-            except Exception as e:
-                logger.debug(f"Could not get cookies (context may be closed): {e}")
-
-            # Get all open tab URLs
-            tab_urls = []
-            for page in context.pages:
-                try:
-                    url = page.url
-                    if url and url != "about:blank":
-                        tab_urls.append(url)
-                except Exception:
-                    pass
-
-            # Save state (cookies optional, tabs are main goal)
-            state = {
-                "cookies": cookies,
-                "tabs": tab_urls,
-            }
-            state_file.write_text(json.dumps(state, indent=2))
-            logger.info(
-                f"Saved browser state: {len(cookies)} cookies, {len(tab_urls)} tabs"
-            )
-
-        except Exception as e:
-            logger.exception(f"Error saving browser state: {e}")
-
     async def _cleanup_profile(self, profile_id: str) -> None:
-        """Clean up profile resources."""
+        """Clean up profile resources from internal tracking dicts."""
         if profile_id in self._browsers:
             del self._browsers[profile_id]
         if profile_id in self._browser_instances:
@@ -732,50 +756,11 @@ class BrowserLauncher:
             del self._pages[profile_id]
         self._monitor_tasks.pop(profile_id, None)
 
-    async def _restore_browser_state(
-        self, profile_id: str, context: BrowserContext
-    ) -> None:
-        """Restore browser state (cookies and tabs) from previous session."""
-        try:
-            user_data_dir = self._data_dir / profile_id
-            state_file = user_data_dir / "browser_state.json"
-
-            if not state_file.exists():
-                return
-
-            state = json.loads(state_file.read_text())
-
-            # Restore cookies
-            cookies = state.get("cookies", [])
-            if cookies:
-                await context.add_cookies(cookies)
-                logger.info(f"Restored {len(cookies)} cookies")
-
-            # Restore tabs
-            tab_urls = state.get("tabs", [])
-            if tab_urls:
-                logger.info(f"Restoring {len(tab_urls)} tabs...")
-
-                # Open saved tabs
-                for i, url in enumerate(tab_urls):
-                    try:
-                        page = await context.new_page()
-                        await page.goto(
-                            url, wait_until="domcontentloaded", timeout=10000
-                        )
-                        logger.debug(f"Restored tab {i+1}/{len(tab_urls)}: {url}")
-                    except Exception as e:
-                        logger.warning(f"Failed to restore tab {url}: {e}")
-
-                logger.info(
-                    f"Successfully restored {len([p for p in context.pages if p.url != 'about:blank'])} tabs"
-                )
-
-        except Exception as e:
-            logger.warning(f"Error restoring browser state: {e}")
-
     async def stop_profile(self, profile_id: str) -> bool:
-        """Stop browser for profile."""
+        """Stop browser for profile.
+
+        Lifecycle: RUNNING → STOPPING → (close browser) → STOPPED
+        """
         try:
             if profile_id in self._stopping:
                 return True
@@ -787,6 +772,11 @@ class BrowserLauncher:
                 self._stopping.discard(profile_id)
                 return True
 
+            # Notify STOPPING state for UI feedback
+            if self._on_status_change:
+                self._on_status_change(profile_id, ProfileStatus.STOPPING)
+
+            # Cancel monitor task first to prevent double-cleanup
             task = self._monitor_tasks.pop(profile_id, None)
             if task is not None:
                 task.cancel()
@@ -795,9 +785,7 @@ class BrowserLauncher:
             if profile_id in self._browsers:
                 camoufox = self._browsers[profile_id]
                 try:
-                    await asyncio.wait_for(
-                        camoufox.__aexit__(None, None, None), timeout=5
-                    )
+                    await asyncio.wait_for(camoufox.__aexit__(None, None, None), timeout=10)
                 except asyncio.TimeoutError:
                     logger.warning("Timed out closing browser for %s", profile_id)
                 except Exception as e:
@@ -813,6 +801,8 @@ class BrowserLauncher:
 
         except Exception as e:
             logger.exception("Error stopping profile: %s", e)
+            if self._on_status_change:
+                self._on_status_change(profile_id, ProfileStatus.ERROR)
             return False
         finally:
             self._stopping.discard(profile_id)
@@ -825,7 +815,45 @@ class BrowserLauncher:
         """Check if profile is currently stopping."""
         return profile_id in self._stopping
 
+    def get_running_profiles(self) -> list[str]:
+        """Return list of profile IDs with running browsers."""
+        return list(self._browser_instances.keys())
+
+    def get_running_count(self) -> int:
+        """Return count of running browsers."""
+        return len(self._browser_instances)
+
     async def cleanup(self) -> None:
-        """Cleanup all browsers."""
-        for profile_id in list(self._browser_instances.keys()):
-            await self.stop_profile(profile_id)
+        """Stop all running browsers gracefully.
+
+        Called on application exit. Stops watchdog first,
+        then closes all browsers concurrently with a timeout.
+        """
+        self.stop_watchdog()
+
+        profile_ids = list(self._browser_instances.keys())
+        if not profile_ids:
+            return
+
+        logger.info("Cleaning up %d running browsers...", len(profile_ids))
+
+        # Stop all browsers concurrently with overall timeout
+        tasks = [self.stop_profile(pid) for pid in profile_ids]
+        try:
+            await asyncio.wait_for(
+                asyncio.gather(*tasks, return_exceptions=True),
+                timeout=15,
+            )
+        except asyncio.TimeoutError:
+            logger.warning(
+                "Cleanup timed out, %d browsers may still be running",
+                len(self._browser_instances),
+            )
+
+        # Force-cleanup any remaining references
+        remaining = list(self._browser_instances.keys())
+        for pid in remaining:
+            logger.warning("Force-cleaning stale browser reference: %s", pid)
+            await self._cleanup_profile(pid)
+
+        logger.info("Browser cleanup complete")

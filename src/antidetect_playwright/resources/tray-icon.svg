@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Simple monochrome tray icon - Chrome style circle with segments -->
+  <!-- Uses currentColor to adapt to system theme -->
+
+  <!-- Outer circle -->
+  <circle cx="11" cy="11" r="10" fill="none" stroke="currentColor" stroke-width="1.5"/>
+
+  <!-- Top segment -->
+  <path d="M 11 11 L 11 1 A 10 10 0 0 1 19.3 6 Z" fill="currentColor" opacity="0.6"/>
+
+  <!-- Bottom left segment -->
+  <path d="M 11 11 L 2.7 16 A 10 10 0 0 1 11 1 Z" fill="currentColor" opacity="0.75"/>
+
+  <!-- Bottom right segment -->
+  <path d="M 11 11 L 19.3 16 A 10 10 0 0 1 2.7 16 Z" fill="currentColor" opacity="0.9"/>
+
+  <!-- Center circle -->
+  <circle cx="11" cy="11" r="4" fill="currentColor"/>
+  <circle cx="11" cy="11" r="3" fill="none" stroke="currentColor" stroke-width="0.5" opacity="0.3"/>
+</svg>
