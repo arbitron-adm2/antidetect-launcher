@@ -4,12 +4,13 @@ Stealth browser with anti-detection. PyQt6 GUI + Camoufox engine.
 
 ## Download
 
-**[v0.1.0](https://github.com/arbitron-adm2/antidetect-playwright/releases/tag/v0.1.0)** — Linux only
+**[v0.1.0](https://github.com/arbitron-adm2/antidetect-playwright/releases/tag/v0.1.0)**
 
-| File | Size | Install |
-|------|------|---------|
-| [antidetect-browser_0.1.0_amd64.deb](https://github.com/arbitron-adm2/antidetect-playwright/releases/download/v0.1.0/antidetect-browser_0.1.0_amd64.deb) | 125 MB | `sudo dpkg -i antidetect-browser_0.1.0_amd64.deb` |
-| [AntidetectBrowser-Linux-x86_64.tar.gz](https://github.com/arbitron-adm2/antidetect-playwright/releases/download/v0.1.0/AntidetectBrowser-Linux-x86_64.tar.gz) | 161 MB | Extract → `./AntidetectBrowser` |
+| Platform | File | Size | Install |
+|----------|------|------|---------|
+| Windows | [AntidetectBrowser-Windows-x64.zip](https://github.com/arbitron-adm2/antidetect-playwright/releases/download/v0.1.0/AntidetectBrowser-Windows-x64.zip) | 93 MB | Extract → run `AntidetectBrowser.exe` |
+| Linux (deb) | [antidetect-browser_0.1.0_amd64.deb](https://github.com/arbitron-adm2/antidetect-playwright/releases/download/v0.1.0/antidetect-browser_0.1.0_amd64.deb) | 125 MB | `sudo dpkg -i antidetect-browser_0.1.0_amd64.deb` |
+| Linux (portable) | [AntidetectBrowser-Linux-x86_64.tar.gz](https://github.com/arbitron-adm2/antidetect-playwright/releases/download/v0.1.0/AntidetectBrowser-Linux-x86_64.tar.gz) | 161 MB | Extract → `./AntidetectBrowser` |
 
 ## Features
 
