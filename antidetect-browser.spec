@@ -30,20 +30,29 @@ else:
     icon_file = None
 
 # Collect all resource files
-datas = [
-    (str(resources_dir / "chrome"), "antidetect_playwright/resources/chrome"),
-    (str(resources_dir / "icon.svg"), "antidetect_playwright/resources"),
-    (str(resources_dir / "app-icon-256.svg"), "antidetect_playwright/resources"),
-    (str(resources_dir / "tray-icon.svg"), "antidetect_playwright/resources"),
-    (str(resources_dir / "default_config"), "antidetect_playwright/resources/default_config"),
-    # Browserforge data files
-    (str(browserforge_data / "fingerprints/data"), "browserforge/fingerprints/data"),
-    (str(browserforge_data / "headers/data"), "browserforge/headers/data"),
-    # Camoufox data files (include all)
-    (str(camoufox_pkg), "camoufox"),
-    # Language tags data
-    (str(language_tags_pkg / "data"), "language_tags/data"),
+datas = []
+
+# App resources (always present)
+for res in ("chrome", "icon.svg", "app-icon-256.svg", "tray-icon.svg", "default_config"):
+    p = resources_dir / res
+    if p.exists():
+        dest = "antidetect_playwright/resources/" + ("chrome" if res == "chrome" else (
+            "default_config" if res == "default_config" else ""))
+        if p.is_dir():
+            datas.append((str(p), f"antidetect_playwright/resources/{res}"))
+        else:
+            datas.append((str(p), "antidetect_playwright/resources"))
+
+# External package data (optional — included when present)
+_optional_data = [
+    (browserforge_data / "fingerprints/data", "browserforge/fingerprints/data"),
+    (browserforge_data / "headers/data",      "browserforge/headers/data"),
+    (camoufox_pkg,                             "camoufox"),
+    (language_tags_pkg / "data",               "language_tags/data"),
 ]
+for src, dest in _optional_data:
+    if src.exists():
+        datas.append((str(src), dest))
 
 # Add config files (from .config/ if present, else from resources/default_config)
 config_dir = project_root / ".config"

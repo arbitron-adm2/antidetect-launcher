@@ -35,8 +35,10 @@ jobs:
         python -m pip install --upgrade pip setuptools wheel
         pip install -e ".[gui,package]"
 
-    - name: Install Playwright browsers
-      run: python -m playwright install firefox
+    - name: Download browser engine data
+      run: |
+        python -c "from browserforge.fingerprints import FingerprintGenerator; FingerprintGenerator()"
+        python -m playwright install firefox
 
     - name: Build with PyInstaller
       run: python -m PyInstaller antidetect-browser.spec --clean --noconfirm
@@ -85,8 +87,10 @@ jobs:
         python -m pip install --upgrade pip setuptools wheel
         pip install -e ".[gui,package]"
 
-    - name: Install Playwright browsers
-      run: python -m playwright install firefox --with-deps
+    - name: Download browser engine data
+      run: |
+        python -c "from browserforge.fingerprints import FingerprintGenerator; FingerprintGenerator()"
+        python -m playwright install firefox --with-deps
 
     - name: Build with PyInstaller
       run: python -m PyInstaller antidetect-browser.spec --clean --noconfirm
