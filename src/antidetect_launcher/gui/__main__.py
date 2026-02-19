@@ -1,4 +1,4 @@
-"""Entry point for antidetect browser GUI."""
+"""Entry point for Antidetect Launcher GUI."""
 
 import os
 import sys

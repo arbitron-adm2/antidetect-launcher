@@ -29,7 +29,7 @@ antidetect-launcher
 
 # Build Flatpak (sandboxed)
 ./build/scripts/build_flatpak.sh
-flatpak install build/flatpak/com.antidetect.Browser-0.1.0.flatpak
+flatpak install build/flatpak/com.antidetect.launcher-0.1.0.flatpak
 ```
 
 ### Build All Formats

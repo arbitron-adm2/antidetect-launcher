@@ -1,4 +1,4 @@
-"""GUI package for antidetect browser."""
+"""GUI package for Antidetect Launcher."""
 
 import os
 

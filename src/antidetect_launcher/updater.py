@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 class UpdateChecker:
     """Check for application updates."""
 
-    UPDATE_MANIFEST_URL = "https://raw.githubusercontent.com/antidetect/antidetect-launcher/main/update-manifest.json"
+    UPDATE_MANIFEST_URL = "https://raw.githubusercontent.com/arbitron-adm2/antidetect-launcher/main/update-manifest.json"
     CHECK_INTERVAL = 3600  # 1 hour
 
     def __init__(self, current_version: str, data_dir: Path):

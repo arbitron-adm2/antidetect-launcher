@@ -3,7 +3,7 @@
 
 import sys
 from pathlib import Path
-import site
+import importlib.util
 
 block_cipher = None
 
@@ -13,11 +13,21 @@ src_dir = project_root / "src"
 resources_dir = src_dir / "antidetect_launcher/resources"
 icon_path = project_root / "build/icons"
 
-# Find browserforge data directory
-site_packages = Path(site.getsitepackages()[0])
-browserforge_data = site_packages / "browserforge"
-camoufox_pkg = site_packages / "camoufox"
-language_tags_pkg = site_packages / "language_tags"
+def _resolve_package_dir(package_name: str) -> Path | None:
+    spec = importlib.util.find_spec(package_name)
+    if spec is None:
+        return None
+    if spec.submodule_search_locations:
+        return Path(next(iter(spec.submodule_search_locations)))
+    if spec.origin:
+        return Path(spec.origin).parent
+    return None
+
+
+browserforge_pkg = _resolve_package_dir("browserforge")
+camoufox_pkg = _resolve_package_dir("camoufox")
+language_tags_pkg = _resolve_package_dir("language_tags")
+apify_datapoints_pkg = _resolve_package_dir("apify_fingerprint_datapoints")
 
 # Platform-specific icon and version info
 if sys.platform == "win32":
@@ -44,12 +54,20 @@ for res in ("chrome", "icon.svg", "app-icon-256.svg", "tray-icon.svg", "default_
             datas.append((str(p), "antidetect_launcher/resources"))
 
 # External package data (optional — included when present)
-_optional_data = [
-    (browserforge_data / "fingerprints/data", "browserforge/fingerprints/data"),
-    (browserforge_data / "headers/data",      "browserforge/headers/data"),
-    (camoufox_pkg,                             "camoufox"),
-    (language_tags_pkg / "data",               "language_tags/data"),
-]
+_optional_data = []
+if browserforge_pkg:
+    _optional_data.extend([
+        (browserforge_pkg / "fingerprints/data", "browserforge/fingerprints/data"),
+        (browserforge_pkg / "headers/data", "browserforge/headers/data"),
+    ])
+if camoufox_pkg:
+    _optional_data.append((camoufox_pkg, "camoufox"))
+if language_tags_pkg:
+    _optional_data.append((language_tags_pkg / "data", "language_tags/data"))
+if apify_datapoints_pkg:
+    _optional_data.append(
+        (apify_datapoints_pkg / "data", "apify_fingerprint_datapoints/data")
+    )
 for src, dest in _optional_data:
     if src.exists():
         datas.append((str(src), dest))
@@ -86,6 +104,8 @@ hiddenimports = [
     'cryptography',
     'orjson',
 ]
+if apify_datapoints_pkg:
+    hiddenimports.append('apify_fingerprint_datapoints')
 
 a = Analysis(
     [str(src_dir / "antidetect_launcher/gui/launcher_pyinstaller.py")],
@@ -150,12 +170,12 @@ if sys.platform == "darwin":
         coll,
         name='AntidetectLauncher.app',
         icon=icon_file,
-        bundle_identifier='com.antidetect.browser',
+        bundle_identifier='com.antidetect.launcher',
         info_plist={
             'CFBundleName': 'Antidetect Launcher',
             'CFBundleDisplayName': 'Antidetect Launcher',
-            'CFBundleVersion': '0.1.0',
-            'CFBundleShortVersionString': '0.1.0',
+            'CFBundleVersion': '0.1.1',
+            'CFBundleShortVersionString': '0.1.1',
             'NSHighResolutionCapable': True,
             'LSMinimumSystemVersion': '10.15.0',
         },

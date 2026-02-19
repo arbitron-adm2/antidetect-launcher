@@ -1,4 +1,4 @@
-"""Data models for antidetect browser profiles."""
+"""Data models for Antidetect Launcher profiles."""
 
 from dataclasses import dataclass, field
 from datetime import datetime

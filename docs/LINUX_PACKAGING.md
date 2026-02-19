@@ -120,23 +120,23 @@ flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flat
 # Build Flatpak
 ./build/scripts/build_flatpak.sh
 
-# Output: build/flatpak/com.antidetect.Browser-0.1.0.flatpak
+# Output: build/flatpak/com.antidetect.launcher-0.1.0.flatpak
 ```
 
 ### Installation
 
 ```bash
 # Install
-flatpak install build/flatpak/com.antidetect.Browser-0.1.0.flatpak
+flatpak install build/flatpak/com.antidetect.launcher-0.1.0.flatpak
 
 # Run
-flatpak run com.antidetect.Browser
+flatpak run com.antidetect.launcher
 ```
 
 ### Uninstallation
 
 ```bash
-flatpak uninstall com.antidetect.Browser
+flatpak uninstall com.antidetect.launcher
 ```
 
 ### Features
@@ -210,7 +210,7 @@ sudo update-desktop-database
 **Permissions denied:**
 ```bash
 # Grant additional permissions
-flatpak override --user --filesystem=home com.antidetect.Browser
+flatpak override --user --filesystem=home com.antidetect.launcher
 ```
 
 ## Automated Building

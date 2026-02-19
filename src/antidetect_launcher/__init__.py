@@ -3,7 +3,7 @@
 from .config import load_config, AppConfig
 from .application import TaskRunner, TaskContext
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 __all__ = [
     "load_config",

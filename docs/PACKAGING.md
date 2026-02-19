@@ -66,8 +66,8 @@ chmod +x build/appimage/AntidetectLauncher-0.1.0-x86_64.AppImage
 ./build/scripts/build_flatpak.sh
 
 # Install and run
-flatpak install build/flatpak/com.antidetect.Browser-0.1.0.flatpak
-flatpak run com.antidetect.Browser
+flatpak install build/flatpak/com.antidetect.launcher-0.1.0.flatpak
+flatpak run com.antidetect.launcher
 ```
 
 ## Package Comparison
@@ -93,8 +93,8 @@ flatpak run com.antidetect.Browser
 - User data: `~/.config/antidetect-launcher/`
 
 ### Flatpak
-- App: `/var/lib/flatpak/app/com.antidetect.Browser/`
-- User data: `~/.var/app/com.antidetect.Browser/`
+- App: `/var/lib/flatpak/app/com.antidetect.launcher/`
+- User data: `~/.var/app/com.antidetect.launcher/`
 
 ## Dependencies
 
@@ -161,7 +161,7 @@ Will host packages at: `https://packages.antidetect.io/`
 
 ### Flathub
 
-Submit `com.antidetect.Browser` to Flathub for distribution.
+Submit `com.antidetect.launcher` to Flathub for distribution.
 
 ### Snap Store
 

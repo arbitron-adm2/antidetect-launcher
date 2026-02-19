@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "antidetect-launcher"
-version = "0.1.0"
+version = "0.1.1"
 description = "Stealth browser launcher with anti-detection capabilities (Camoufox)"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -32,6 +32,7 @@ dependencies = [
     "cryptography>=43.0.0",
     "orjson>=3.10.0",
     "browserforge>=1.2.1",
+    "apify-fingerprint-datapoints>=0.10.0",
 ]
 
 [project.optional-dependencies]

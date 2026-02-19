@@ -6,6 +6,7 @@ import os
 import subprocess
 import sys
 import tempfile
+from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from typing import Optional
 from urllib.request import urlopen, Request
@@ -13,11 +14,19 @@ from urllib.request import urlopen, Request
 logger = logging.getLogger(__name__)
 
 
+def _resolve_current_version() -> str:
+    try:
+        return version("antidetect-launcher")
+    except PackageNotFoundError:
+        return "0.1.1"
+
+
 class AutoUpdater:
     """Handles automatic updates for the application."""
 
-    UPDATE_URL = "https://api.github.com/repos/antidetect/antidetect-launcher/releases/latest"
-    CURRENT_VERSION = "0.1.0"
+    UPDATE_URL = "https://api.github.com/repos/arbitron-adm2/antidetect-launcher/releases/latest"
+    CURRENT_VERSION = _resolve_current_version()
+    USER_AGENT = f"Antidetect-Launcher/{CURRENT_VERSION}"
 
     def __init__(self, check_on_startup: bool = True):
         """Initialize auto-updater.
@@ -45,7 +54,7 @@ class AutoUpdater:
             # Fetch latest release info from GitHub
             req = Request(
                 self.UPDATE_URL,
-                headers={"User-Agent": "Antidetect-Browser/0.1.0"}
+                headers={"User-Agent": self.USER_AGENT}
             )
 
             with urlopen(req, timeout=5) as response:
@@ -106,7 +115,7 @@ class AutoUpdater:
             # Download file
             req = Request(
                 self._download_url,
-                headers={"User-Agent": "Antidetect-Browser/0.1.0"}
+                headers={"User-Agent": self.USER_AGENT}
             )
 
             with urlopen(req) as response:

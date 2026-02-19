@@ -904,7 +904,7 @@ def show_settings_popup(parent, settings) -> bool:
     browser_path_widget.setLayout(browser_path_container)
     browser_layout.addRow("Custom browser:", browser_path_widget)
 
-    browser_path_help = QLabel("Path to custom AntiDetect browser executable")
+    browser_path_help = QLabel("Path to custom browser executable")
     browser_path_help.setStyleSheet(f"color: {COLORS['text_muted']}; font-size: 11px;")
     browser_layout.addRow("", browser_path_help)
 

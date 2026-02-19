@@ -169,14 +169,14 @@ def _win_set_autostart(enabled: bool) -> bool:
 
 # --- macOS ---
 
-_MAC_PLIST_PATH = Path.home() / "Library" / "LaunchAgents" / "com.antidetect.browser.plist"
+_MAC_PLIST_PATH = Path.home() / "Library" / "LaunchAgents" / "com.antidetect.launcher.plist"
 
 _MAC_PLIST_TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
     <key>Label</key>
-    <string>com.antidetect.browser</string>
+    <string>com.antidetect.launcher</string>
     <key>ProgramArguments</key>
     <array>
         <string>{exec_path}</string>
